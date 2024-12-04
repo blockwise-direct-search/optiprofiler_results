@@ -20,7 +20,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         matlab: [latest]
-        dim: [big]
+        dim: [small]
         with_optim_toolbox: [yes]
         solver: [cbds]
         competitor: [lam]
