@@ -47,6 +47,13 @@ jobs:
           repository: Lht97/profile_optiprofiler
           ref: main
           path: profile_optiprofiler
+      
+      - name: Checkout BDS
+        uses: actions/checkout@v4
+        with:
+          repository: blockwise-direct-search/bds
+          ref: main
+          path: bds
 
       - name: Install Texlive
         run: sudo apt-get update && sudo apt-get install texlive
@@ -73,6 +80,7 @@ jobs:
         with:
           command: |
             root_dir = pwd()
+            ls
 
             % Setup optiprofiler
             cd(fullfile(root_dir, 'optiprofiler'));
@@ -80,16 +88,15 @@ jobs:
             cd(root_dir);
 
             % Setup bds
-            cd(fullfile(root_dir, 'src'));
+            cd(fullfile(root_dir, 'bds'));
             setup
-            cd(fullfile(root_dir, 'tests', 'competitors'));
+            cd(fullfile(root_dir, 'bds', 'tests', 'competitors'));
             addpath(pwd);
             cd(root_dir);
 
             % profile
-            cd(fullfile(root_dir, 'profile_optiprofiler'));
             options = struct();
-            options.feature = '${{ matrix.feature }}';
+            options.feature_name = '${{ matrix.feature }}';
             options.labels = {'${{ matrix.solver }}', '${{ matrix.competitor }}'};
             if strcmpi('${{ matrix.dim }}', 'small')
                 options.mindim = 2;
