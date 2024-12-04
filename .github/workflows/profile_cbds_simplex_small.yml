@@ -1,4 +1,4 @@
-name: Profile bds and lam using optiprofiler, small
+name: Profile cbds and simplex using optiprofiler, small
 
 on:
   # Trigger the workflow on push or pull request
@@ -13,7 +13,7 @@ env:
 
 jobs:
   test:
-    name: Profile BDS and lam, small
+    name: Profile BDS and fminsearch, small
     runs-on: ${{matrix.os }}
     strategy:
       fail-fast: false
@@ -23,7 +23,7 @@ jobs:
         dim: [small]
         with_optim_toolbox: [yes]
         solver: [cbds]
-        competitor: [lam]
+        competitor: [fminsearch]
         run_plain: [yes, no]
         feature: [plain, perturbed_x0, noisy, truncated, permuted, linearly_transformed, random_nan, quantized, custom]
 
