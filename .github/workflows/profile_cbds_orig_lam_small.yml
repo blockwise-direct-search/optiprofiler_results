@@ -1,0 +1,104 @@
+name: Profile default cbds and lam using optiprofiler, small
+
+on:
+  # Trigger the workflow on push or pull request
+  # push:
+  # Trigger the workflow manually
+  schedule:
+    - cron: '0 12 */3 * *'
+  workflow_dispatch:
+
+env:
+    GFORTRAN_VERSION: 12
+
+jobs:
+  test:
+    name: Profile BDS and lam, small
+    runs-on: ${{matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        matlab: [latest]
+        dim: [small]
+        with_optim_toolbox: [yes]
+        solver: [cbds-original]
+        competitor: [lam]
+        run_plain: [yes, no]
+        feature: [plain, perturbed_x0, noisy, truncated, permuted, linearly_transformed, random_nan, quantized, custom]
+
+    steps:
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Checkout OptiProfiler
+        uses: actions/checkout@v4
+        with:
+          repository: optiprofiler/optiprofiler
+          ref: matlab
+          path: optiprofiler
+      
+      - name: Checkout BDS
+        uses: actions/checkout@v4
+        with:
+          repository: blockwise-direct-search/bds
+          ref: main
+          path: bds
+
+      - name: Install Texlive
+        run: sudo apt-get update && sudo apt-get install texlive
+
+      - name: Check whether LaTeX is installed
+        run: pdflatex --version
+
+      - name: Cache MATLAB
+        id: cache-matlab
+        uses: actions/cache@v4.0.1
+        with:
+          path: ${{ runner.tool_cache }}/MATLAB
+          key: ${{ matrix.os }}-${{ matrix.matlab }}-${{ matrix.with_optim_toolbox }}
+
+      - name: Set up MATLAB with optimization toolbox
+        if: ${{ matrix.with_optim_toolbox == 'yes' }}
+        uses: matlab-actions/setup-matlab@v2.1.2
+        with:
+          release: ${{ matrix.matlab }}
+          products: Optimization_Toolbox
+
+      - name: Run test
+        uses: matlab-actions/run-command@v2.1.1
+        with:
+          command: |
+            root_dir = pwd()
+            ls
+
+            % Setup optiprofiler
+            cd(fullfile(root_dir, 'optiprofiler'));
+            setup
+            cd(root_dir);
+
+            % Setup bds
+            cd(fullfile(root_dir, 'bds'));
+            setup
+            cd(fullfile(root_dir, 'bds', 'tests', 'competitors'));
+            addpath(pwd);
+
+            % profile
+            cd(root_dir);
+            options = struct();
+            options.feature_name = '${{ matrix.feature }}';
+            options.labels = {'${{ matrix.solver }}', '${{ matrix.competitor }}'};
+            options,dim = '${{ matrix.dim }}';
+            options.run_plain = ${{ matrix.run_plain }};
+            profile_optiprofiler(options);
+            cd(root_dir);
+
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: profile_optiprofiler_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_${{ matrix.run_plain }}
+          path: ./out
