@@ -91,7 +91,7 @@ jobs:
             options = struct();
             options.feature_name = '${{ matrix.feature }}';
             options.labels = {'${{ matrix.solver }}', '${{ matrix.competitor }}'};
-            options,dim = '${{ matrix.dim }}';
+            options.dim = '${{ matrix.dim }}';
             options.run_plain = ${{ matrix.run_plain }};
             profile_optiprofiler(options);
             cd(root_dir);
