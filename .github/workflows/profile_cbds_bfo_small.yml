@@ -1,8 +1,8 @@
-name: Profile cbds and ds using optiprofiler, small
+name: Profile cbds and bfo using optiprofiler, small
 
 on:
   # Trigger the workflow on push or pull request
-  push:
+  # push:
   # Trigger the workflow manually
   schedule:
     - cron: '0 12 */3 * *'
@@ -13,7 +13,7 @@ env:
 
 jobs:
   test:
-    name: Profile BDS and ds, small
+    name: Profile BDS and bfo, small
     runs-on: ${{matrix.os }}
     strategy:
       fail-fast: false
@@ -23,7 +23,7 @@ jobs:
         dim: [small]
         with_optim_toolbox: [yes]
         solver: [cbds]
-        competitor: [ds]
+        competitor: [bfo]
         run_plain: [yes, no]
         feature: [plain, perturbed_x0, noisy, truncated, permuted, linearly_transformed, random_nan, quantized, custom]
 
@@ -47,6 +47,16 @@ jobs:
           repository: Lht97/profile_optiprofiler
           ref: main
           path: profile_optiprofiler
+
+      - name: Clone BFO
+        uses: actions/checkout@v4
+        with:
+            repository: m01marpor/BFO
+            path: bfo
+    
+      - name: modify BFO
+        run: 
+          cd ./bfo && sed -i '/^found  /{s/.*/found = 1/;n;d;}' bfo.m && cat bfo.m | grep found
       
       - name: Checkout BDS
         uses: actions/checkout@v4
@@ -91,6 +101,10 @@ jobs:
             cd(fullfile(root_dir, 'bds'));
             setup
             cd(fullfile(root_dir, 'bds', 'tests', 'competitors'));
+            addpath(pwd);
+
+            % Setup bfo
+            cd(fullfile(root_dir, 'bfo'));
             addpath(pwd);
 
             % profile
