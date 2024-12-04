@@ -51,6 +51,7 @@ function profile_optiprofiler(options)
             options.maxdim = 50;
         end
     end
+    options
     if ~isfield(options, 'mindim')
         options.mindim = 2;
     end
