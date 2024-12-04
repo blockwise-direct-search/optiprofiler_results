@@ -1,4 +1,4 @@
-name: Profile cbds and newuoa using optiprofiler, small
+name: Profile cbds and newuoa using optiprofiler, big
 
 on:
   # Trigger the workflow on push or pull request
@@ -13,14 +13,14 @@ env:
 
 jobs:
   test:
-    name: Profile BDS and newuoa, small
+    name: Profile BDS and newuoa, big
     runs-on: ${{matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
         matlab: [latest]
-        dim: [small]
+        dim: [big]
         with_optim_toolbox: [yes]
         solver: [cbds]
         competitor: [newuoa]
