@@ -1,0 +1,126 @@
+name: Profile bds and lam using optiprofiler, small
+
+on:
+  # Trigger the workflow on push or pull request
+  push:
+  # Trigger the workflow manually
+  schedule:
+    - cron: '0 12 */3 * *'
+  workflow_dispatch:
+
+env:
+    GFORTRAN_VERSION: 12
+
+jobs:
+  test:
+    name: Profile BDS and lam, small
+    runs-on: ${{matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        matlab: [latest]
+        dim: [big]
+        with_optim_toolbox: [yes]
+        solver: [cbds]
+        competitor: [lam]
+        run_plain: [yes, no]
+        feature: [plain, perturbed_x0, noisy, truncated, permuted, linearly_transformed, random_nan, quantized, custom]
+
+    steps:
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Checkout OptiProfiler
+        uses: actions/checkout@v4
+        with:
+          repository: optiprofiler/optiprofiler
+          ref: matlab
+          path: optiprofiler
+
+      - name: Checkout OptiProfiler Script
+        uses: actions/checkout@v4
+        with:
+          repository: Lht97/optiprofiler_script
+          ref: main
+          path: optiprofiler_script
+
+      - name: Link gfortran for MATLAB on Linux
+        if: startsWith(matrix.os, 'ubuntu')
+        run: bash .github/scripts/link_gfortran ${{ env.GFORTRAN_VERSION }}
+
+      - name: Install epstopdf and ghostscript
+        if: startsWith(matrix.os, 'ubuntu')
+        run: bash .github/scripts/install_epstopdf && bash .github/scripts/install_ghostscript
+
+      - name: Install Texlive
+        run: sudo apt-get update && sudo apt-get install texlive
+
+      - name: Check whether LaTeX is installed
+        run: pdflatex --version
+
+      - name: Cache MATLAB
+        id: cache-matlab
+        uses: actions/cache@v4.0.1
+        with:
+          path: ${{ runner.tool_cache }}/MATLAB
+          key: ${{ matrix.os }}-${{ matrix.matlab }}-${{ matrix.with_optim_toolbox }}
+
+      - name: Set up MATLAB with optimization toolbox
+        if: ${{ matrix.with_optim_toolbox == 'yes' }}
+        uses: matlab-actions/setup-matlab@v2.1.2
+        with:
+          release: ${{ matrix.matlab }}
+          products: Optimization_Toolbox
+
+      - name: Run test
+        uses: matlab-actions/run-command@v2.1.1
+        with:
+          command: |
+            root_dir = pwd()
+
+            % Setup optiprofiler
+            cd(fullfile(root_dir, 'optiprofiler'));
+            setup
+            cd(root_dir);
+
+            % Setup bds
+            cd(fullfile(root_dir, 'src'));
+            setup
+            cd(fullfile(root_dir, 'tests', 'competitors'));
+            addpath(pwd);
+            cd(root_dir);
+
+            % profile
+            cd(fullfile(root_dir, 'optiprofiler_script'));
+            options = struct();
+            options.feature = '${{ matrix.feature }}';
+            options.labels = {'${{ matrix.solver }}', '${{ matrix.competitor }}'};
+            if strcmpi('${{ matrix.dim }}', 'small')
+                options.mindim = 2;
+                options.maxdim = 5;
+            elseif strcmpi('${{ matrix.dim }}', 'big')
+                options.mindim = 6;
+                options.maxdim = 50;
+            end
+            if strcmpi('${{ matrix.feature }}', 'plain')
+                options.n_runs = 1;
+            else
+                options.n_runs = 3;
+            end
+            if strcmpi('${{ matrix.run_plain }}', 'yes')
+                options.run_plain = true;
+            else
+                options.run_plain = false;
+            end
+            optiprofiler_script(options);
+
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: optiprofiler_profile_bds_lam_small
+          path: ./optiprofiler_script/out
