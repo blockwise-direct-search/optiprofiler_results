@@ -1,4 +1,4 @@
-name: Profile cbds and simplex using optiprofiler, small
+name: Profile cbds and newuoa using optiprofiler, small
 
 on:
   # Trigger the workflow on push or pull request
@@ -13,7 +13,7 @@ env:
 
 jobs:
   test:
-    name: Profile BDS and fminsearch, small
+    name: Profile BDS and newuoa, small
     runs-on: ${{matrix.os }}
     strategy:
       fail-fast: false
@@ -23,7 +23,7 @@ jobs:
         dim: [small]
         with_optim_toolbox: [yes]
         solver: [cbds]
-        competitor: [fminsearch]
+        competitor: [newuoa]
         run_plain: [true, false]
         feature: [plain, perturbed_x0, noisy, truncated, permuted, linearly_transformed, random_nan, quantized, custom]
 
@@ -40,6 +40,12 @@ jobs:
           repository: optiprofiler/optiprofiler
           ref: matlab
           path: optiprofiler
+
+      - name: Clone PRIMA
+        uses: actions/checkout@v4
+        with:
+          repository: libprima/prima
+          path: prima
       
       - name: Checkout BDS
         uses: actions/checkout@v4
@@ -79,6 +85,11 @@ jobs:
             cd(fullfile(root_dir, 'optiprofiler'));
             setup
             cd(root_dir);
+
+            % Compile prima
+            path_prima = fullfile(root_dir, 'prima');
+            cd(path_prima);
+            setup
 
             % Setup bds
             cd(fullfile(root_dir, 'bds'));

@@ -40,13 +40,6 @@ jobs:
           repository: optiprofiler/optiprofiler
           ref: matlab
           path: optiprofiler
-
-      - name: Checkout OptiProfiler Script
-        uses: actions/checkout@v4
-        with:
-          repository: Lht97/profile_optiprofiler
-          ref: main
-          path: profile_optiprofiler
       
       - name: Checkout BDS
         uses: actions/checkout@v4
@@ -94,27 +87,12 @@ jobs:
             addpath(pwd);
 
             % profile
-            cd(fullfile(root_dir, 'profile_optiprofiler'));
+            cd(root_dir);
             options = struct();
             options.feature_name = '${{ matrix.feature }}';
             options.labels = {'${{ matrix.solver }}', '${{ matrix.competitor }}'};
-            if strcmpi('${{ matrix.dim }}', 'small')
-                options.mindim = 2;
-                options.maxdim = 5;
-            elseif strcmpi('${{ matrix.dim }}', 'big')
-                options.mindim = 6;
-                options.maxdim = 50;
-            end
-            if strcmpi('${{ matrix.feature }}', 'plain')
-                options.n_runs = 1;
-            else
-                options.n_runs = 3;
-            end
-            if strcmpi('${{ matrix.run_plain }}', 'yes')
-                options.run_plain = true;
-            else
-                options.run_plain = false;
-            end
+            options,dim = '${{ matrix.dim }}';
+            options.run_plain = ${{ matrix.run_plain }};
             profile_optiprofiler(options);
             cd(root_dir);
 
@@ -123,4 +101,4 @@ jobs:
         uses: actions/upload-artifact@v3.1.2
         with:
           name: profile_optiprofiler_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_${{ matrix.run_plain }}
-          path: ./profile_optiprofiler/out
+          path: ./out
