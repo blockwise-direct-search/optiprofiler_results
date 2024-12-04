@@ -24,7 +24,7 @@ jobs:
         with_optim_toolbox: [yes]
         solver: [cbds]
         competitor: [fminunc]
-        run_plain: [true, false]
+        run_plain: [false]
         feature: [plain]
 
     steps:
@@ -87,7 +87,7 @@ jobs:
             addpath(pwd);
 
             % profile
-            cd(root_dir);
+            cd(fullfile(root_dir, 'bds', 'tests'));
             options = struct();
             options.feature_name = '${{ matrix.feature }}';
             feature_adaptive = ['noisy', 'truncated', 'custom'];
@@ -106,4 +106,4 @@ jobs:
         uses: actions/upload-artifact@v3.1.2
         with:
           name: profile_optiprofiler_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_plain_${{ matrix.run_plain }}
-          path: ./out
+          path: ./bds/tests/out
