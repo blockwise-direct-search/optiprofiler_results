@@ -92,9 +92,9 @@ jobs:
             setup
             cd(fullfile(root_dir, 'bds', 'tests', 'competitors'));
             addpath(pwd);
-            cd(root_dir);
 
             % profile
+            cd(fullfile(root_dir, 'profile_optiprofiler'));
             options = struct();
             options.feature_name = '${{ matrix.feature }}';
             options.labels = {'${{ matrix.solver }}', '${{ matrix.competitor }}'};
