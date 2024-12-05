@@ -2,10 +2,10 @@ name: Profile default cbds and lam using optiprofiler, small
 
 on:
   # Trigger the workflow on push or pull request
-  push:
+  # push:
   # Trigger the workflow manually
   schedule:
-    - cron: '0 12 */3 * *'
+    - cron: '0 8 */2 * *'
   workflow_dispatch:
 
 env:
