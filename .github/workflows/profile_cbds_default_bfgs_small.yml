@@ -2,7 +2,7 @@ name: Profile default cbds and bfgs using optiprofiler, small
 
 on:
   # Trigger the workflow on push or pull request
-  # push:
+  push:
   # Trigger the workflow manually
   schedule:
     - cron: '0 2 */3 * *'
@@ -93,6 +93,7 @@ jobs:
             options.labels = {'${{ matrix.solver }}', '${{ matrix.competitor }}'};
             options.dim = '${{ matrix.dim }}';
             options.run_plain = ${{ matrix.run_plain }};
+            options.n_jobs = 2;
             profile_optiprofiler(options);
             cd(root_dir);
 
