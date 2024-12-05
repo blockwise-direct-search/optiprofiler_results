@@ -1,8 +1,8 @@
-name: Profile cbds and bfo using optiprofiler, big
+name: Profile default cbds and bfo using optiprofiler, big
 
 on:
   # Trigger the workflow on push or pull request
-  push:
+  # push:
   # Trigger the workflow manually
   schedule:
     - cron: '0 3 */3 * *'
