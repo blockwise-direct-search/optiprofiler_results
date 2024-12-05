@@ -2,10 +2,10 @@ name: Profile cbds and bfgs using optiprofiler, big
 
 on:
   # Trigger the workflow on push or pull request
-  # push:
+  push:
   # Trigger the workflow manually
   schedule:
-    - cron: '0 0 */3 * *'
+    - cron: '0 0 */2 * *'
   workflow_dispatch:
 
 env:
@@ -90,12 +90,7 @@ jobs:
             cd(fullfile(root_dir, 'bds', 'tests'));
             options = struct();
             options.feature_name = '${{ matrix.feature }}';
-            feature_adaptive = ['noisy', 'truncated', 'custom'];
-            if ismember('${{ matrix.feature }}', feature_adaptive)
-              options.labels = {'${{ matrix.solver }}', 'fminunc-adaptive'}; 
-            else
-              options.labels = {'${{ matrix.solver }}', '${{ matrix.competitor }}'};
-            end
+            options.labels = {'${{ matrix.solver }}', '${{ matrix.competitor }}'};
             options.dim = '${{ matrix.dim }}';
             options.run_plain = ${{ matrix.run_plain }};
             profile_optiprofiler(options);
