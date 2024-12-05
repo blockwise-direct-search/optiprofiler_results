@@ -13,7 +13,7 @@ env:
 
 jobs:
   test:
-    name: Profile BDS and fminunc, big
+    name: Profile BDS and default BDS, big
     runs-on: ${{matrix.os }}
     strategy:
       fail-fast: false
