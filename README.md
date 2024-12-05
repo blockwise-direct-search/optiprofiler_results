@@ -2,6 +2,7 @@
 
 [GitHub Actions](https://docs.github.com/en/actions).
 - [![Check Spelling](https://github.com/blockwise-direct-search/optiprofiler_results/actions/workflows/spelling.yml/badge.svg)](https://github.com/blockwise-direct-search/optiprofiler_results/actions/workflows/spelling.yml)
+- [![Profiles of cbds and default cbds, big](https://github.com/blockwise-direct-search/optiprofiler_results/actions/workflows/profile_cbds_default_cbds_big.yml/badge.svg)](https://github.com/blockwise-direct-search/optiprofiler_results/actions/workflows/profile_cbds_default_cbds_big.yml)
 - [![Profiles of cbds and lam, big](https://github.com/blockwise-direct-search/optiprofiler_results/actions/workflows/profile_cbds_lam_big.yml/badge.svg)](https://github.com/blockwise-direct-search/optiprofiler_results/actions/workflows/profile_cbds_lam_big.yml)
 - [![Profiles of default cbds and lam, big](https://github.com/blockwise-direct-search/optiprofiler_results/actions/workflows/profile_default_cbds_lam_big.yml/badge.svg)](https://github.com/blockwise-direct-search/optiprofiler_results/actions/workflows/profile_default_cbds_lam_big.yml)
 - [![Profiles of default cbds and lam, small](https://github.com/blockwise-direct-search/optiprofiler_results/actions/workflows/profile_default_cbds_lam_small.yml/badge.svg)](https://github.com/blockwise-direct-search/optiprofiler_results/actions/workflows/profile_default_cbds_lam_small.yml)
