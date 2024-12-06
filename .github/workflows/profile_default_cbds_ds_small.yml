@@ -2,10 +2,10 @@ name: Profile default cbds and ds using optiprofiler, small
 
 on:
   # Trigger the workflow on # push or pull request
-  # push:
+  push:
   # Trigger the workflow manually
   schedule:
-    - cron: '0 18 */3 * *'
+    - cron: '0 18 */4 * *'
   workflow_dispatch:
 
 env:

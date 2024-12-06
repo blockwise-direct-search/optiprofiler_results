@@ -2,10 +2,10 @@ name: Profile default cbds and simplex using optiprofiler, small
 
 on:
   # Trigger the workflow on # push or pull request
-  # push:
+  push:
   # Trigger the workflow manually
   schedule:
-    - cron: '0 1 */5 * *'
+    - cron: '0 1 */4 * *'
   workflow_dispatch:
 
 env:

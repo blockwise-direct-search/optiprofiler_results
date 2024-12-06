@@ -2,10 +2,10 @@ name: Profile cbds and default cbds, small
 
 on:
   # Trigger the workflow on # push or pull request
-  # push:
+  push:
   # Trigger the workflow manually
   schedule:
-    - cron: '0 2 */2 * *'
+    - cron: '0 2 */4 * *'
   workflow_dispatch:
 
 env:
