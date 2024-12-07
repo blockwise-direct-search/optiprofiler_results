@@ -94,6 +94,9 @@ jobs:
             profile_optiprofiler(options);
             cd(root_dir);
 
+      - name: Check output before upload
+        run: ls -R ./bds/tests/out
+
       - name: Upload artifact
         uses: actions/upload-artifact@v3.1.2
         with:
