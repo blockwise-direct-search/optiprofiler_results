@@ -86,21 +86,26 @@ jobs:
         uses: matlab-actions/run-command@v2.1.1
         with:
           command: |
-            root_dir = pwd()
-            ls
+            LD_PRELOAD=/lib64/libstdc++.so.6 matlab -batch "
+            root_dir = pwd();
+            ls;
 
             % Setup optiprofiler
             cd(fullfile(root_dir, 'optiprofiler'));
-            setup
+            setup;
             cd(root_dir);
 
             % Setup bds
             cd(fullfile(root_dir, 'bds'));
-            setup
+            setup;
             cd(fullfile(root_dir, 'bds', 'tests', 'competitors'));
             addpath(pwd);
 
-            % profile
+            % Setup nomad
+            cd(fullfile(root_dir, 'nomad', 'build', 'release', 'lib'));
+            addpath(pwd);
+
+            % Profile
             cd(fullfile(root_dir, 'bds', 'tests'));
             options = struct();
             options.feature_name = '${{ matrix.feature }}';
@@ -109,6 +114,7 @@ jobs:
             options.run_plain = ${{ matrix.run_plain }};
             profile_optiprofiler(options);
             cd(root_dir);
+            "
 
 
       - name: Upload artifact
