@@ -118,9 +118,15 @@ jobs:
       #       "
       #       shell: /usr/bin/bash  # 确保使用 Bash shell
 
+      - name: Copy MATLAB license file
+        run: |
+          cp ./licenses/license.lic /home/runner/.matlab/license.lic  # 替换为正确的路径
+
       - name: Run MATLAB with LD_PRELOAD
         run: |
-          env LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6 matlab -batch "disp('Hello, MATLAB!')"
+          env LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6 \
+          MATLAB_LICENSE_FILE=/home/runner/.matlab/license.lic \
+          matlab -batch "disp('Hello, MATLAB!')"
 
 
       - name: Upload artifact
