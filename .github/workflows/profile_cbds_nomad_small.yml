@@ -1,11 +1,11 @@
-name: Profile cbds and newuoa using optiprofiler, big
+name: Profile cbds and nomad using optiprofiler, small
 
 on:
-  # Trigger the workflow on push or pull request
-  # push:
+  # Trigger the workflow on # push or pull request
+  push:
   # Trigger the workflow manually
   # schedule:
-  # - cron: '0 20 */2 * *'
+  # - cron: '0 0 */4 * *'
   workflow_dispatch:
 
 env:
@@ -13,17 +13,17 @@ env:
 
 jobs:
   test:
-    name: Profile BDS and newuoa, big
+    name: Profile BDS and nomad, small
     runs-on: ${{matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
         matlab: [latest]
-        dim: [big]
+        dim: [small]
         with_optim_toolbox: [yes]
         solver: [cbds]
-        competitor: [newuoa]
+        competitor: [nomad]
         run_plain: [false]
         feature: [plain, perturbed_x0, noisy_1e-1, noisy_1e-2, noisy_1e-3, noisy_1e-4, truncated_1, truncated_2, truncated_3, truncated_4, permuted, linearly_transformed, random_nan_5, random_nan_10, random_nan_20, quantized, rotation_noisy_1e-1, rotation_noisy_1e-2, rotation_noisy_1e-3, rotation_noisy_1e-4]
 
@@ -40,12 +40,6 @@ jobs:
           repository: optiprofiler/optiprofiler
           ref: matlab
           path: optiprofiler
-
-      - name: Clone PRIMA
-        uses: actions/checkout@v4
-        with:
-          repository: libprima/prima
-          path: prima
       
       - name: Checkout BDS
         uses: actions/checkout@v4
@@ -53,6 +47,13 @@ jobs:
           repository: blockwise-direct-search/bds
           ref: main
           path: bds
+
+      - name: Checkout Nomad
+        uses: actions/checkout@v4
+        with:
+            repository: bbopt/nomad
+            ref: main
+            path: nomad   
 
       - name: Install Texlive
         run: sudo apt-get update && sudo apt-get install texlive
@@ -74,6 +75,14 @@ jobs:
           release: ${{ matrix.matlab }}
           products: Optimization_Toolbox
 
+      - name: Set up Nomad
+        run: |
+            cd ./nomad 
+            && cmake --version 
+            && cmake -DTEST_OPENMP=OFF -DBUILD_INTERFACE_MATLAB=ON -S . -B build/release
+            && cmake --build build/release
+            && cmake --install build/release
+
       - name: Run test
         uses: matlab-actions/run-command@v2.1.1
         with:
@@ -85,11 +94,6 @@ jobs:
             cd(fullfile(root_dir, 'optiprofiler'));
             setup
             cd(root_dir);
-
-            % Compile prima
-            path_prima = fullfile(root_dir, 'prima');
-            cd(path_prima);
-            setup
 
             % Setup bds
             cd(fullfile(root_dir, 'bds'));

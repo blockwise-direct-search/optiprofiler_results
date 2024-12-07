@@ -5,7 +5,7 @@ on:
   # push:
   # Trigger the workflow manually
   # schedule:
-#    - cron: '0 0 */2 * *'
+  # - cron: '0 0 */2 * *'
   workflow_dispatch:
 
 env:
@@ -25,7 +25,7 @@ jobs:
         solver: [cbds]
         competitor: [fminunc]
         run_plain: [false]
-        feature: [plain, perturbed_x0, noisy_1e-1, noisy_1e-2, noisy_1e-3, noisy_1e-4, truncated_3, truncated_6, truncated_9, permuted, linearly_transformed, random_nan_5, random_nan_15, random_nan_25, quantized, rotation_noisy_1e-1, rotation_noisy_1e-2, rotation_noisy_1e-3, rotation_noisy_1e-4]
+        feature: [plain, perturbed_x0, noisy_1e-1, noisy_1e-2, noisy_1e-3, noisy_1e-4, truncated_1, truncated_2, truncated_3, truncated_4, permuted, linearly_transformed, random_nan_5, random_nan_10, random_nan_20, quantized, rotation_noisy_1e-1, rotation_noisy_1e-2, rotation_noisy_1e-3, rotation_noisy_1e-4]
 
     steps:
 
