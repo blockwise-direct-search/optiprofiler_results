@@ -105,6 +105,11 @@ jobs:
     needs: test  # 等待 test job 完成后再执行
         
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
       - name: Download all artifacts
         env:
           GH_TOKEN: ${{ github.token }}  # 设置 GH_TOKEN 环境变量
