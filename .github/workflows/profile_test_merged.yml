@@ -112,15 +112,15 @@ jobs:
 
       - name: Download all artifacts
         env:
-          GH_TOKEN: ${{ github.token }}  # 设置 GH_TOKEN 环境变量
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 确保使用 GitHub Token
         run: |
           mkdir -p ./downloaded_artifacts
           for solver in cbds; do
             for competitor in fminunc; do
               for run_plain in true false; do
-                artifact_name=profile_optiprofiler_${solver}_${competitor}_small_plain_${run_plain}
+                artifact_name=profile_optiprofiler_${solver}_${competitor}_small_plain_plain_${run_plain}
                 echo "Downloading artifact: $artifact_name"
-                gh run download ${{ github.run.id }} --name "$artifact_name" --dir ./downloaded_artifacts/
+                gh run download ${{ github.run_id }} --name "$artifact_name" --dir ./downloaded_artifacts/ || echo "No matching artifact found for $artifact_name"
               done
             done
           done
