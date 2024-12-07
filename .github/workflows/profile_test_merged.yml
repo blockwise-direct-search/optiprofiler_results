@@ -98,43 +98,48 @@ jobs:
         run: ls -R ./bds/tests/out
 
       - name: Upload artifact
+        id: upload_artifact
         uses: actions/upload-artifact@v3.1.2
         with:
           name: profile_optiprofiler_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_plain_${{ matrix.run_plain }}
           path: ./bds/tests/out
 
-  download_and_upload:
-    runs-on: ubuntu-latest
+      - name: Set artifact name output
+        id: set_output
+        run: echo "artifact_name=profile_optiprofiler_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_plain_${{ matrix.run_plain }}" >> $GITHUB_ENV
+
+  merge_artifacts:
     needs: test
-
+    runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Create directory for downloaded artifacts
-        run: mkdir -p ./downloaded_artifacts
-
-      - name: Download Artifacts
+      - name: Set artifact name from environment variable
         run: |
-          for run_plain in true false; do
-            artifact_name="profile_optiprofiler_cbds_fminunc_small_plain_${run_plain}"
-            echo "Downloading artifact: $artifact_name"
-            # 使用 actions/download-artifact 作为步骤
-            echo "##[command]::set-output name=artifact_name::$artifact_name"
-            echo "##[command]::add-metadata name=artifact_name::$artifact_name"
-            echo "##[command]::add-metadata name=run_plain::$run_plain"
-            actions/download-artifact@v3 --name "$artifact_name" --path ./downloaded_artifacts/
-          done
+          echo "Setting artifact name..."
+          echo "ARTIFACT_NAME=profile_optiprofiler_${{ github.event.inputs.solver }}_${{ github.event.inputs.competitor }}_${{ github.event.inputs.dim }}_${{ github.event.inputs.feature }}_plain_${{ github.event.inputs.run_plain }}" >> $GITHUB_ENV
 
-      - name: Consolidate artifacts
+      - name: Download artifact
         run: |
-          mkdir -p ./final_artifacts
-          mv ./downloaded_artifacts/* ./final_artifacts/
+          echo "Downloading artifact..."
+          echo "Artifact name: $ARTIFACT_NAME"
+          mkdir -p ./merged_artifacts
+          # 使用 GitHub API 下载 artifact
+          curl -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -o ./merged_artifacts/$ARTIFACT_NAME.zip \
+          "https://api.github.com/repos/${{ github.repository }}/actions/artifacts"
 
-      - name: Upload consolidated artifact
+      - name: Unzip downloaded artifact
+        run: |
+          apt-get update && apt-get install -y unzip
+          unzip ./merged_artifacts/$ARTIFACT_NAME.zip -d ./merged_artifacts
+
+      - name: Merge artifacts
+        run: |
+          mkdir -p ./final_output
+          cp -r ./merged_artifacts/* ./final_output/
+          # 这里可以根据需要添加合并逻辑，例如合并文件、生成报告等
+
+      - name: Upload merged artifact
         uses: actions/upload-artifact@v3.1.2
         with:
-          name: consolidated_artifact
-          path: ./final_artifacts/
+          name: merged_profile_artifacts
+          path: ./final_output
