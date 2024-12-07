@@ -116,7 +116,7 @@ jobs:
           mkdir -p ./merged_artifacts
 
           for run_plain in true false; do
-            artifact_name="profile_optiprofiler_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_plain_${run_plain}"
+            artifact_name="profile_optiprofiler_${matrix.solver}_${matrix.competitor}_${matrix.dim}_${matrix.feature}_plain_${run_plain}"
             echo "Artifact name: $artifact_name"
             artifact_id=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/actions/artifacts" | jq -r ".artifacts[] | select(.name == \"$artifact_name\") | .id")
