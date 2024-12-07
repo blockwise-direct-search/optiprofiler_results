@@ -119,7 +119,7 @@ jobs:
           
           # 使用 GitHub API 下载对应的所有 artifact
           for run_plain in true false; do
-            artifact_name="profile_optiprofiler_cbds_fminunc_small_plain_${run_plain}"
+            artifact_name="profile_optiprofiler_cbds_fminunc_small_plain_plain_${run_plain}"
             echo "Artifact name: $artifact_name"
             artifact_id=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/actions/artifacts" | jq -r ".artifacts[] | select(.name == \"$artifact_name\") | .id")
