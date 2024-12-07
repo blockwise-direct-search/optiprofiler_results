@@ -118,14 +118,15 @@ jobs:
       #       "
       #       shell: /usr/bin/bash  # 确保使用 Bash shell
 
-      - name: Run MATLAB with LD_PRELOAD
-        run: |
-          env LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6 \
-          matlab -batch "disp('Hello, MATLAB!')"
-
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3.1.2
-        with:
-          name: profile_optiprofiler_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_plain_${{ matrix.run_plain }}
-          path: ./bds/tests/out
+    - name: Set LD_PRELOAD
+      run: echo "LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6" >> $GITHUB_ENV
+    
+    - name: Run MATLAB
+      run: |
+        matlab -batch "disp('Hello, MATLAB!')"
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3.1.2
+      with:
+        name: profile_optiprofiler_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_plain_${{ matrix.run_plain }}
+        path: ./bds/tests/out
