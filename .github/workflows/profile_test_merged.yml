@@ -113,8 +113,7 @@ jobs:
               for run_plain in true false; do
                 artifact_name=profile_optiprofiler_${solver}_${competitor}_small_plain_${run_plain}
                 echo "Downloading artifact: $artifact_name"
-                echo "::set-output name=artifact_name::$artifact_name"
-                gh run download ${{ github.run_id }} --name "$artifact_name" --path ./downloaded_artifacts/
+                gh run download ${{ github.run_id }} --name "$artifact_name" --dir ./downloaded_artifacts/
               done
             done
           done
