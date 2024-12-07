@@ -112,9 +112,6 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - name: Read artifact name from environment variable
-        run: echo "ARTIFACT_NAME=$ARTIFACT_NAME"
-        
       - name: Download artifact
         run: |
           echo "Downloading artifact..."
