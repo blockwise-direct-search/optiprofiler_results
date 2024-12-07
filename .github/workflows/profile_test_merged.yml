@@ -70,18 +70,18 @@ jobs:
             root_dir = pwd();
             ls;
 
-            # Setup optiprofiler
+            % Setup optiprofiler
             cd(fullfile(root_dir, 'optiprofiler'));
             setup;
             cd(root_dir);
 
-            # Setup bds
+            % Setup bds
             cd(fullfile(root_dir, 'bds'));
             setup;
             cd(fullfile(root_dir, 'bds', 'tests', 'competitors'));
             addpath(pwd);
 
-            # Profile
+            % Profile
             cd(fullfile(root_dir, 'bds', 'tests'));
             options = struct();
             options.feature_name = '${{ matrix.feature }}';
@@ -100,39 +100,40 @@ jobs:
           name: profile_optiprofiler_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_plain_${{ matrix.run_plain }}
           path: ./bds/tests/out
 
+
   download_and_upload:
-    runs-on: ubuntu-latest
-    needs: test
-      
-    steps:
-      - name: Set up GitHub CLI
-        run: echo "GH_TOKEN=${{ github.token }}" >> $GITHUB_ENV
-
-      - name: Check out repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Set variables
-        run: |
-          dim="small"
-          feature="plain"
-          solver="cbds"
-          competitor="fminunc"
-          mkdir -p ./downloaded_artifacts
-          for run_plain in true false; do
-            artifact_name=profile_optiprofiler_${solver}_${competitor}_${dim}_${feature}_plain_${run_plain}
-            echo "Downloading artifact: $artifact_name"
-            gh run download ${{ github.run_id }} --name "$artifact_name" --dir ./downloaded_artifacts/ || echo "No matching artifact found for $artifact_name" --token ${{ secrets.GH_TOKEN }}
-          done
-
-      - name: Consolidate artifacts
-        run: |
-          mkdir -p ./final_artifacts
-          mv ./downloaded_artifacts/* ./final_artifacts/
-
-      - name: Upload consolidated artifact
-        uses: actions/upload-artifact@v3.1.2
-        with:
-          name: consolidated_artifact
-          path: ./final_artifacts/
+            runs-on: ubuntu-latest
+            needs: test
+              
+            steps:
+              - name: Set up GitHub CLI
+                run: echo "GH_TOKEN=${{ github.token }}" >> $GITHUB_ENV
+        
+              - name: Check out repository
+                uses: actions/checkout@v4
+                with:
+                  submodules: recursive
+        
+              - name: Set variables
+                run: |
+                  dim="small"
+                  feature="plain"
+                  solver="cbds"
+                  competitor="fminunc"
+                  mkdir -p ./downloaded_artifacts
+                  for run_plain in true false; do
+                    artifact_name=profile_optiprofiler_${solver}_${competitor}_${dim}_${feature}_plain_${run_plain}
+                    echo "Downloading artifact: $artifact_name"
+                    gh run download ${{ github.run_id }} --name "$artifact_name" --dir ./downloaded_artifacts/ || echo "No matching artifact found for $artifact_name" --token ${{ secrets.GH_TOKEN }}
+                  done
+        
+              - name: Consolidate artifacts
+                run: |
+                  mkdir -p ./final_artifacts
+                  mv ./downloaded_artifacts/* ./final_artifacts/
+        
+              - name: Upload consolidated artifact
+                uses: actions/upload-artifact@v3.1.2
+                with:
+                  name: consolidated_artifact
+                  path: ./final_artifacts/
