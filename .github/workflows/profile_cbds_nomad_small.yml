@@ -104,6 +104,10 @@ jobs:
             cd(fullfile(root_dir, 'bds', 'tests', 'competitors'));
             addpath(pwd);
 
+            % Setup nomad
+            cd(fullfile(root_dir, 'nomad', 'build', 'release', 'lib'));
+            addpath(pwd);
+
             % profile
             cd(fullfile(root_dir, 'bds', 'tests'));
             options = struct();
