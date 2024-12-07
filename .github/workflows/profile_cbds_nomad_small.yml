@@ -108,15 +108,19 @@ jobs:
             cd(fullfile(root_dir, 'nomad', 'build', 'release', 'lib'));
             addpath(pwd);
 
-            % profile
-            cd(fullfile(root_dir, 'bds', 'tests'));
-            options = struct();
-            options.feature_name = '${{ matrix.feature }}';
-            options.labels = {'${{ matrix.solver }}', '${{ matrix.competitor }}'};
-            options.dim = '${{ matrix.dim }}';
-            options.run_plain = ${{ matrix.run_plain }};
-            profile_optiprofiler(options);
-            cd(root_dir);
+            % See whether nomad works
+            cd(fullfile(root_dir, 'nomad', 'interfaces', 'Matlab_MEX'));
+            test_nomad_gerad
+
+            # % profile
+            # cd(fullfile(root_dir, 'bds', 'tests'));
+            # options = struct();
+            # options.feature_name = '${{ matrix.feature }}';
+            # options.labels = {'${{ matrix.solver }}', '${{ matrix.competitor }}'};
+            # options.dim = '${{ matrix.dim }}';
+            # options.run_plain = ${{ matrix.run_plain }};
+            # profile_optiprofiler(options);
+            # cd(root_dir);
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3.1.2
