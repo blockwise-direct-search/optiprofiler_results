@@ -106,25 +106,30 @@ jobs:
 
       - name: Set artifact name output
         id: set_output
-        run: echo "artifact_name=profile_optiprofiler_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_plain_${{ matrix.run_plain }}" >> $GITHUB_ENV
+        run: echo "ARTIFACT_NAME=profile_optiprofiler_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_plain_${{ matrix.run_plain }}" >> $GITHUB_ENV
 
   merge_artifacts:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - name: Set artifact name from environment variable
-        run: |
-          echo "Setting artifact name..."
-          echo "ARTIFACT_NAME=${{ env.artifact_name }}" >> $GITHUB_ENV
-
+      - name: Read artifact name from environment variable
+        run: echo "ARTIFACT_NAME=$ARTIFACT_NAME"
+        
       - name: Download artifact
         run: |
           echo "Downloading artifact..."
           echo "Artifact name: $ARTIFACT_NAME"
           mkdir -p ./merged_artifacts
+          
           # 使用 GitHub API 下载对应 artifact
           artifact_id=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           "https://api.github.com/repos/${{ github.repository }}/actions/artifacts" | jq -r ".artifacts[] | select(.name == \"$ARTIFACT_NAME\") | .id")
+
+          if [ -z "$artifact_id" ]; then
+            echo "Artifact not found!"
+            exit 1
+          fi
+
           curl -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           -o ./merged_artifacts/$ARTIFACT_NAME.zip \
           "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$artifact_id/zip"
