@@ -129,7 +129,7 @@ jobs:
 
       - name: Unzip downloaded artifact
         run: |
-          apt-get update && apt-get install -y unzip
+          sudo apt-get update && sudo apt-get install -y unzip
           unzip ./merged_artifacts/$ARTIFACT_NAME.zip -d ./merged_artifacts
 
       - name: Merge artifacts
