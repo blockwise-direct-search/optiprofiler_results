@@ -120,33 +120,9 @@ jobs:
 
       - name: Run MATLAB with LD_PRELOAD
         env:
-          LD_PRELOAD: /lib64/libstdc++.so.6
+          LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libstdc++.so.6
         run: |
-              matlab -r "
-              root_dir = pwd();
-              ls;
-
-              # % Setup optiprofiler
-              # cd(fullfile(root_dir, 'optiprofiler'));
-              # setup;
-              # cd(root_dir);
-
-              # % Setup bds
-              # cd(fullfile(root_dir, 'bds'));
-              # setup;
-              # cd(fullfile(root_dir, 'bds', 'tests', 'competitors'));
-              # addpath(pwd);
-
-              # % profile
-              # cd(fullfile(root_dir, 'bds', 'tests'));
-              # options = struct();
-              # options.feature_name = '${{ matrix.feature }}';
-              # options.labels = {'${{ matrix.solver }}', '${{ matrix.competitor }}'};
-              # options.dim = '${{ matrix.dim }}';
-              # options.run_plain = ${{ matrix.run_plain }};
-              # profile_optiprofiler(options);
-              # cd(root_dir);
-              "
+          matlab -batch "disp('Hello, MATLAB!')"
 
 
       - name: Upload artifact
