@@ -108,24 +108,47 @@ jobs:
         id: set_output
         run: echo "ARTIFACT_NAME=profile_optiprofiler_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_plain_${{ matrix.run_plain }}" >> $GITHUB_ENV
 
-      - name: Download artifact
+  merge_artifacts:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
         run: |
-          echo "Downloading artifact..."
-          echo "Artifact name: $ARTIFACT_NAME"
+          echo "Downloading artifacts..."
           mkdir -p ./merged_artifacts
-      
-          # 调试输出artifact列表
-          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/artifacts"
-      
-          # 使用 GitHub API 下载对应 artifact
-          artifact_id=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          "https://api.github.com/repos/${{ github.repository }}/actions/artifacts" | jq -r ".artifacts[] | select(.name == \"$ARTIFACT_NAME\") | .id")
-      
-          if [ -z "$artifact_id" ]; then
-            echo "Artifact not found!"
-            exit 1
-          fi
-      
-          curl -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          -o ./merged_artifacts/$ARTIFACT_NAME.zip \
-          "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$artifact_id/zip"
+          
+          # 使用 GitHub API 下载对应的所有 artifact
+          for run_plain in true false; do
+            artifact_name="profile_optiprofiler_cbds_fminunc_small_plain_${run_plain}"
+            echo "Artifact name: $artifact_name"
+            artifact_id=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts" | jq -r ".artifacts[] | select(.name == \"$artifact_name\") | .id")
+
+            if [ -z "$artifact_id" ]; then
+              echo "Artifact $artifact_name not found!"
+              continue
+            fi
+
+            curl -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -o ./merged_artifacts/$artifact_name.zip \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$artifact_id/zip"
+          done
+
+      - name: Unzip downloaded artifacts
+        run: |
+          sudo apt-get update && sudo apt-get install -y unzip
+          for zip_file in ./merged_artifacts/*.zip; do
+            unzip "$zip_file" -d ./merged_artifacts
+          done
+
+      - name: Merge artifacts
+        run: |
+          mkdir -p ./final_output
+          cp -r ./merged_artifacts/* ./final_output/
+          # 这里可以根据需要添加合并逻辑，例如合并文件、生成报告等
+
+      - name: Upload merged artifact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: merged_profile_artifacts
+          path: ./final_output
