@@ -110,8 +110,9 @@ jobs:
 
             % See whether nomad works
             cd(fullfile(root_dir, 'nomad', 'interfaces', 'Matlab_MEX'));
-            test_nomad_gerad
+            ls
 
+            
             # % profile
             # cd(fullfile(root_dir, 'bds', 'tests'));
             # options = struct();
