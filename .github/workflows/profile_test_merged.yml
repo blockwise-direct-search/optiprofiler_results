@@ -118,6 +118,8 @@ jobs:
           for run_plain in true false; do
             artifact_name="profile_optiprofiler_cbds_fminunc_small_plain_${run_plain}"
             echo "Downloading artifact: $artifact_name"
+            # 使用 download-artifact action
+            echo "##[command]::set-output name=artifact_name::$artifact_name"
             actions/download-artifact@v3 --name "$artifact_name" --path ./downloaded_artifacts/ || echo "Artifact $artifact_name not found."
           done
 
