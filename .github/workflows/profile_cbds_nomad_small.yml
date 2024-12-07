@@ -109,8 +109,10 @@ jobs:
             setup
             cd(fullfile(root_dir, 'bds', 'tests', 'competitors'));
             addpath(pwd);
-            cd(fullfile(root_dir, 'bds', 'tests'));
-            locate_matcutest();
+
+            % Setup matcutest
+            cd(fullfile(root_dir, 'matcutest'));
+            install
 
             % Setup nomad
             cd(fullfile(root_dir, 'nomad', 'build', 'release', 'lib'));
