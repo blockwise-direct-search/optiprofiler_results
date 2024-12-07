@@ -87,9 +87,6 @@ jobs:
             options.feature_name = '${{ matrix.feature }}';
             options.labels = {'${{ matrix.solver }}', '${{ matrix.competitor }}'};
             options.dim = '${{ matrix.dim }}';
-            options = rmfield(options, 'dim');
-            options.mindim = 1;
-            options.maxdim = 1;
             options.run_plain = ${{ matrix.run_plain }};
             profile_optiprofiler(options);
             cd(root_dir);
