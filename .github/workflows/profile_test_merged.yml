@@ -115,12 +115,9 @@ jobs:
 
       - name: Download Artifacts
         run: |
-          # 遍历所有的矩阵组合
           for run_plain in true false; do
             artifact_name="profile_optiprofiler_cbds_fminunc_small_plain_${run_plain}"
             echo "Downloading artifact: $artifact_name"
-            # 使用 actions/download-artifact 下载
-            echo "##[command]actions/download-artifact@v3"
             actions/download-artifact@v3 --name "$artifact_name" --path ./downloaded_artifacts/ || echo "Artifact $artifact_name not found."
           done
 
