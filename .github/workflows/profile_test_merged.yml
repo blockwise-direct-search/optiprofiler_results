@@ -68,8 +68,6 @@ jobs:
         with:
           command: |
             root_dir = pwd();
-            ls;
-
             % Setup optiprofiler
             cd(fullfile(root_dir, 'optiprofiler'));
             setup;
@@ -116,8 +114,7 @@ jobs:
         run: |
           echo "Downloading artifacts..."
           mkdir -p ./merged_artifacts
-          
-          # 使用 GitHub API 下载对应的所有 artifact
+
           for run_plain in true false; do
             artifact_name="profile_optiprofiler_cbds_fminunc_small_plain_plain_${run_plain}"
             echo "Artifact name: $artifact_name"
@@ -129,9 +126,10 @@ jobs:
               continue
             fi
 
+            download_url="https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$artifact_id/zip"
+            echo "Downloading from URL: $download_url"
             curl -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -o ./merged_artifacts/$artifact_name.zip \
-            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$artifact_id/zip"
+            -o ./merged_artifacts/$artifact_name.zip "$download_url"
           done
 
       - name: Unzip downloaded artifacts
@@ -145,7 +143,7 @@ jobs:
         run: |
           mkdir -p ./final_output
           cp -r ./merged_artifacts/* ./final_output/
-          # 这里可以根据需要添加合并逻辑，例如合并文件、生成报告等
+          # 可以根据需要添加合并逻辑，例如合并文件、生成报告等
 
       - name: Upload merged artifact
         uses: actions/upload-artifact@v3.1.2
