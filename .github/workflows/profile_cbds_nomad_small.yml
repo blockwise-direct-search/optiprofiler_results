@@ -83,50 +83,39 @@ jobs:
             cmake --install build/release
             find /usr/lib /lib -name "libstdc++.so.6"
 
-      # - name: Run test
-      #   uses: matlab-actions/run-command@v2.1.1
-      #   with:
-      #     command: |
-      #       LD_PRELOAD=/lib64/libstdc++.so.6 matlab -batch "
-      #       root_dir = pwd;
-      #       ls;
+      - name: Set LD_PRELOAD
+        run: echo "LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6" >> $GITHUB_ENV
 
-      #       % Setup optiprofiler
-      #       cd(fullfile(root_dir, 'optiprofiler'));
-      #       setup;
-      #       cd(root_dir);
+      - name: Run test
+        uses: matlab-actions/run-command@v2.1.1
+        with:
+          command: |
+            root_dir = pwd()
+            ls
 
-      #       % Setup bds
-      #       cd(fullfile(root_dir, 'bds'));
-      #       setup;
-      #       cd(fullfile(root_dir, 'bds', 'tests', 'competitors'));
-      #       addpath(pwd);
+            % Setup optiprofiler
+            cd(fullfile(root_dir, 'optiprofiler'));
+            setup
+            cd(root_dir);
 
-      #       % Setup nomad
-      #       cd(fullfile(root_dir, 'nomad', 'build', 'release', 'lib'));
-      #       addpath(pwd);
+            % Setup bds
+            cd(fullfile(root_dir, 'bds'));
+            setup
+            cd(fullfile(root_dir, 'bds', 'tests', 'competitors'));
+            addpath(pwd);
 
-      #       % Profile
-      #       cd(fullfile(root_dir, 'bds', 'tests'));
-      #       options = struct();
-      #       options.feature_name = '${{ matrix.feature }}';
-      #       options.labels = {'${{ matrix.solver }}', '${{ matrix.competitor }}'};
-      #       options.dim = '${{ matrix.dim }}';
-      #       options.run_plain = ${{ matrix.run_plain }};
-      #       profile_optiprofiler(options);
-      #       cd(root_dir);
-      #       "
-      #       shell: /usr/bin/bash  # 确保使用 Bash shell
+            % profile
+            cd(fullfile(root_dir, 'bds', 'tests'));
+            options = struct();
+            options.feature_name = '${{ matrix.feature }}';
+            options.labels = {'${{ matrix.solver }}', '${{ matrix.competitor }}'};
+            options.dim = '${{ matrix.dim }}';
+            options.run_plain = ${{ matrix.run_plain }};
+            profile_optiprofiler(options);
+            cd(root_dir);
 
-    - name: Set LD_PRELOAD
-      run: echo "LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6" >> $GITHUB_ENV
-    
-    - name: Run MATLAB
-      run: |
-        matlab -batch "disp('Hello, MATLAB!')"
-    
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3.1.2
-      with:
-        name: profile_optiprofiler_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_plain_${{ matrix.run_plain }}
-        path: ./bds/tests/out
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: profile_optiprofiler_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_plain_${{ matrix.run_plain }}
+          path: ./bds/tests/out
