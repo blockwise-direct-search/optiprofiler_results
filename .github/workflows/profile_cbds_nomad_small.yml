@@ -117,11 +117,11 @@ jobs:
       #       "
       #       shell: /usr/bin/bash  # 确保使用 Bash shell
 
-      - name: Run test
-        uses: matlab-actions/run-command@v2.1.1
-        with:
-            command: |
-              LD_PRELOAD=/lib64/libstdc++.so.6 matlab -r "
+      - name: Run MATLAB with LD_PRELOAD
+        env:
+          LD_PRELOAD: /lib64/libstdc++.so.6
+        run: |
+              matlab -r "
               root_dir = pwd();
               ls;
 
