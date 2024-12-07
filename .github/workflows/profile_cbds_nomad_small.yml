@@ -125,26 +125,26 @@ jobs:
               root_dir = pwd();
               ls;
 
-              % Setup optiprofiler
-              cd(fullfile(root_dir, 'optiprofiler'));
-              setup;
-              cd(root_dir);
+              # % Setup optiprofiler
+              # cd(fullfile(root_dir, 'optiprofiler'));
+              # setup;
+              # cd(root_dir);
 
-              % Setup bds
-              cd(fullfile(root_dir, 'bds'));
-              setup;
-              cd(fullfile(root_dir, 'bds', 'tests', 'competitors'));
-              addpath(pwd);
+              # % Setup bds
+              # cd(fullfile(root_dir, 'bds'));
+              # setup;
+              # cd(fullfile(root_dir, 'bds', 'tests', 'competitors'));
+              # addpath(pwd);
 
-              % profile
-              cd(fullfile(root_dir, 'bds', 'tests'));
-              options = struct();
-              options.feature_name = '${{ matrix.feature }}';
-              options.labels = {'${{ matrix.solver }}', '${{ matrix.competitor }}'};
-              options.dim = '${{ matrix.dim }}';
-              options.run_plain = ${{ matrix.run_plain }};
-              profile_optiprofiler(options);
-              cd(root_dir);
+              # % profile
+              # cd(fullfile(root_dir, 'bds', 'tests'));
+              # options = struct();
+              # options.feature_name = '${{ matrix.feature }}';
+              # options.labels = {'${{ matrix.solver }}', '${{ matrix.competitor }}'};
+              # options.dim = '${{ matrix.dim }}';
+              # options.run_plain = ${{ matrix.run_plain }};
+              # profile_optiprofiler(options);
+              # cd(root_dir);
               "
 
 
