@@ -100,32 +100,27 @@ jobs:
           name: profile_optiprofiler_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_plain_${{ matrix.run_plain }}
           path: ./bds/tests/out
 
-
   download_and_upload:
     runs-on: ubuntu-latest
     needs: test
-  
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Set variables
+      - name: Download Artifacts
         run: |
-          dim="small"  # 与 test 作业中的 dim 一致
-          feature="plain"  # 与 test 作业中的 feature 一致
-          solver="cbds"  # 与 test 作业中的 solver 一致
-          competitor="fminunc"  # 与 test 作业中的 competitor 一致
           mkdir -p ./downloaded_artifacts
+          # 遍历矩阵中的所有组合
           for run_plain in true false; do
-            # 构造 artifact 名称与上传时一致
-            artifact_name=profile_optiprofiler_${solver}_${competitor}_${dim}_${feature}_plain_${run_plain}
+            artifact_name="profile_optiprofiler_cbds_fminunc_small_plain_${run_plain}"
             echo "Downloading artifact: $artifact_name"
-            gh run download ${{ github.run_id }} --name "$artifact_name" --dir ./downloaded_artifacts/ || echo "No matching artifact found for $artifact_name"
+            # 使用 actions/download-artifact 下载
+            echo "Downloading artifact: $artifact_name" # Log for clarity
+            actions/download-artifact@v3 --name "$artifact_name" --path ./downloaded_artifacts/
           done
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 确保使用 GitHub Token
 
       - name: Consolidate artifacts
         run: |
