@@ -115,17 +115,19 @@ jobs:
       - name: Set artifact name from environment variable
         run: |
           echo "Setting artifact name..."
-          echo "ARTIFACT_NAME=profile_optiprofiler_${{ github.event.inputs.solver }}_${{ github.event.inputs.competitor }}_${{ github.event.inputs.dim }}_${{ github.event.inputs.feature }}_plain_${{ github.event.inputs.run_plain }}" >> $GITHUB_ENV
+          echo "ARTIFACT_NAME=${{ env.artifact_name }}" >> $GITHUB_ENV
 
       - name: Download artifact
         run: |
           echo "Downloading artifact..."
           echo "Artifact name: $ARTIFACT_NAME"
           mkdir -p ./merged_artifacts
-          # 使用 GitHub API 下载 artifact
+          # 使用 GitHub API 下载对应 artifact
+          artifact_id=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/repos/${{ github.repository }}/actions/artifacts" | jq -r ".artifacts[] | select(.name == \"$ARTIFACT_NAME\") | .id")
           curl -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           -o ./merged_artifacts/$ARTIFACT_NAME.zip \
-          "https://api.github.com/repos/${{ github.repository }}/actions/artifacts"
+          "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$artifact_id/zip"
 
       - name: Unzip downloaded artifact
         run: |
