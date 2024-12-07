@@ -119,10 +119,8 @@ jobs:
       #       shell: /usr/bin/bash  # 确保使用 Bash shell
 
       - name: Run MATLAB with LD_PRELOAD
-        env:
-          LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libstdc++.so.6
         run: |
-          matlab -batch "disp('Hello, MATLAB!')"
+          env LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6 matlab -batch "disp('Hello, MATLAB!')"
 
 
       - name: Upload artifact
