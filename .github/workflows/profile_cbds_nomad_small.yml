@@ -87,7 +87,7 @@ jobs:
         with:
           command: |
             LD_PRELOAD=/lib64/libstdc++.so.6 matlab -batch "
-            root_dir = pwd();
+            root_dir = pwd;
             ls;
 
             % Setup optiprofiler
@@ -107,7 +107,7 @@ jobs:
 
             % Profile
             cd(fullfile(root_dir, 'bds', 'tests'));
-            options = struct();
+            options = struct;
             options.feature_name = '${{ matrix.feature }}';
             options.labels = {'${{ matrix.solver }}', '${{ matrix.competitor }}'};
             options.dim = '${{ matrix.dim }}';
