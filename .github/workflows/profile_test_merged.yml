@@ -70,18 +70,18 @@ jobs:
             root_dir = pwd();
             ls;
 
-            % Setup optiprofiler
+            # Setup optiprofiler
             cd(fullfile(root_dir, 'optiprofiler'));
             setup;
             cd(root_dir);
 
-            % Setup bds
+            # Setup bds
             cd(fullfile(root_dir, 'bds'));
             setup;
             cd(fullfile(root_dir, 'bds', 'tests', 'competitors'));
             addpath(pwd);
 
-            % Profile
+            # Profile
             cd(fullfile(root_dir, 'bds', 'tests'));
             options = struct();
             options.feature_name = '${{ matrix.feature }}';
@@ -102,35 +102,37 @@ jobs:
 
   download_and_upload:
     runs-on: ubuntu-latest
-    needs: test  # 等待 test job 完成后再执行
+    needs: test
       
     steps:
-    - name: Check out repository
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
+      - name: Set up GitHub CLI
+        run: echo "GH_TOKEN=${{ github.token }}" >> $GITHUB_ENV
 
-    - name: Set variables
-      run: |
-        dim="small"  # 与 test 作业中的 dim 一致
-        feature="plain"  # 与 test 作业中的 feature 一致
-        solver="cbds"  # 与 test 作业中的 solver 一致
-        competitor="fminunc"  # 与 test 作业中的 competitor 一致
-        mkdir -p ./downloaded_artifacts
-        for run_plain in true false; do
-          artifact_name=profile_optiprofiler_${solver}_${competitor}_${dim}_${feature}_plain_${run_plain}
-          echo "Downloading artifact: $artifact_name"
-          gh run download ${{ github.run_id }} --name "$artifact_name" --dir ./downloaded_artifacts/ || echo "No matching artifact found for $artifact_name"
-        done
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-    - name: Consolidate artifacts
-      run: |
-        mkdir -p ./final_artifacts
-        # 将所有下载的 artifacts 移动到 final_artifacts 目录
-        mv ./downloaded_artifacts/* ./final_artifacts/
+      - name: Set variables
+        run: |
+          dim="small"
+          feature="plain"
+          solver="cbds"
+          competitor="fminunc"
+          mkdir -p ./downloaded_artifacts
+          for run_plain in true false; do
+            artifact_name=profile_optiprofiler_${solver}_${competitor}_${dim}_${feature}_plain_${run_plain}
+            echo "Downloading artifact: $artifact_name"
+            gh run download ${{ github.run_id }} --name "$artifact_name" --dir ./downloaded_artifacts/ || echo "No matching artifact found for $artifact_name" --token ${{ secrets.GH_TOKEN }}
+          done
 
-    - name: Upload consolidated artifact
-      uses: actions/upload-artifact@v3.1.2
-      with:
-        name: consolidated_artifact
-        path: ./final_artifacts/
+      - name: Consolidate artifacts
+        run: |
+          mkdir -p ./final_artifacts
+          mv ./downloaded_artifacts/* ./final_artifacts/
+
+      - name: Upload consolidated artifact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: consolidated_artifact
+          path: ./final_artifacts/
