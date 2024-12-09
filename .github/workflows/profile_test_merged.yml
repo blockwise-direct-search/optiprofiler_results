@@ -100,6 +100,10 @@ jobs:
           name: profile_optiprofiler_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_plain_${{ matrix.run_plain }}
           path: ./bds/tests/out
 
+      - name: List files in output directory
+        run: |
+            ls -la ./bds/tests/out
+
   merge_artifacts:
     name: Merge Artifacts
     runs-on: ubuntu-latest
