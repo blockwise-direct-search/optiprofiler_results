@@ -21,7 +21,7 @@ jobs:
         solver: [cbds]
         competitor: [fminunc]
         run_plain: [false]
-        feature: [plain, truncated_1]
+        feature: [plain, truncated_1, truncated_2]
 
     steps:
       - name: Check out repository
@@ -118,7 +118,7 @@ jobs:
         solver: [cbds]
         competitor: [fminunc]
         run_plain: [false]
-        feature: [plain, truncated_1]
+        feature: [plain, truncated_1, truncated_2]
     
     steps:
       - name: Setup workspace cache
