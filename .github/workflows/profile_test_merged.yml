@@ -114,4 +114,4 @@ jobs:
         uses: actions/upload-artifact/merge@v4
         with:
           name: merged_artifacts
-          pattern: profile_optiprofiler_*
+          pattern: cbds_fminunc_*
