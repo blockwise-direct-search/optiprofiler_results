@@ -111,9 +111,14 @@ jobs:
     needs: test
     continue-on-error: true
     steps:
+      - name: Check available artifacts
+        run: |
+          echo "Available artifacts:"
+          gh run list  # 使用 GitHub CLI 检查可用的 artifacts
+
       - name: Merge Artifacts
         uses: actions/upload-artifact/merge@v4
         with:
           name: merged_artifacts
-          pattern: profile_optiprofiler_*
+          pattern: profile_optiprofiler_*  # 与上传时相同的模式
           separate-directories: false
