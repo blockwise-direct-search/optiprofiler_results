@@ -117,10 +117,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4  # 再次 checkout 代码以支持 GitHub CLI
 
-      - name: Check available artifacts
+      - name: List uploaded artifacts using API
         run: |
-          echo "Available artifacts:"
-          gh run list  # 使用 GitHub CLI 检查可用的 artifacts
+          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               https://api.github.com/repos/${{ github.repository }}/actions/artifact
 
       - name: Merge Artifacts
         uses: actions/upload-artifact/merge@v4
