@@ -105,6 +105,47 @@ jobs:
           echo "Uploaded artifacts:"
           ls -la ./bds/tests/out/
 
+  # merge_artifacts:
+  #   name: Merge Artifacts
+  #   runs-on: ubuntu-latest
+  #   needs: test
+  #   permissions:
+  #     actions: read
+  #     contents: read
+  #   strategy:
+  #     matrix:
+  #       feature: [plain, truncated_1]
+    
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+
+  #     - name: Download artifacts
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: profile_optiprofiler_cbds_fminunc_small_${{ matrix.feature }}_plain_false
+  #         path: artifacts/${{ matrix.feature }}
+
+  #     - name: List downloaded artifacts
+  #       run: |
+  #         echo "Artifact name being downloaded: profile_optiprofiler_cbds_fminunc_small_${{ matrix.feature }}_plain_false"
+  #         echo "Artifacts contents:"
+  #         ls -la artifacts/${{ matrix.feature }}/ || echo "Artifacts not found"
+
+  #     - name: Upload merged artifacts
+  #       if: success() && matrix.feature == 'truncated_1'
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: merged_artifacts
+  #         path: artifacts/**
+  #         if-no-files-found: error
+
+  #     - name: List final artifacts
+  #       if: success() && matrix.feature == 'truncated_1'
+  #       run: |
+  #         echo "Final artifacts:"
+  #         ls -la artifacts/
+
   merge_artifacts:
     name: Merge Artifacts
     runs-on: ubuntu-latest
@@ -117,8 +158,12 @@ jobs:
         feature: [plain, truncated_1]
     
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Setup workspace cache
+        uses: actions/cache@v3
+        with:
+          path: artifacts
+          key: artifacts-${{ github.run_id }}
+          restore-keys: artifacts-${{ github.run_id }}
 
       - name: Download artifacts
         uses: actions/download-artifact@v3
@@ -126,22 +171,20 @@ jobs:
           name: profile_optiprofiler_cbds_fminunc_small_${{ matrix.feature }}_plain_false
           path: artifacts/${{ matrix.feature }}
 
-      - name: List downloaded artifacts
+      - name: List current artifacts
         run: |
-          echo "Artifact name being downloaded: profile_optiprofiler_cbds_fminunc_small_${{ matrix.feature }}_plain_false"
-          echo "Artifacts contents:"
-          ls -la artifacts/${{ matrix.feature }}/ || echo "Artifacts not found"
+          echo "Current feature: ${{ matrix.feature }}"
+          ls -R artifacts/
 
       - name: Upload merged artifacts
-        if: success() && matrix.feature == 'truncated_1'
         uses: actions/upload-artifact@v3
         with:
           name: merged_artifacts
           path: artifacts/**
           if-no-files-found: error
+          retention-days: 1
 
       - name: List final artifacts
-        if: success() && matrix.feature == 'truncated_1'
         run: |
-          echo "Final artifacts:"
-          ls -la artifacts/
+          echo "All artifacts:"
+          ls -R artifacts/
