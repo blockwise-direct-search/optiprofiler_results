@@ -109,26 +109,39 @@ jobs:
     name: Merge Artifacts
     runs-on: ubuntu-latest
     needs: test
-    continue-on-error: true
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 设置 GH_TOKEN 环境变量 
     permissions:
       actions: read
       contents: read
-
+    strategy:
+      matrix:
+        feature: [plain, truncated_1]
+    
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Wait for artifacts
-        run: sleep 30
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: profile_optiprofiler_cbds_fminunc_small_${{ matrix.feature }}_plain_false
+          path: artifacts
 
       - name: List downloaded artifacts
         run: |
-          echo "Current directory contents:"
-          ls -R
+          echo "Artifact name being downloaded: profile_optiprofiler_cbds_fminunc_small_${{ matrix.feature }}_plain_false"
+          echo "Artifacts contents:"
+          ls -la artifacts/ || echo "Artifacts not found"
 
-      - name: Merge Artifacts
-        uses: actions/upload-artifact/merge@v4
+      - name: Upload merged artifacts
+        if: success() && matrix.feature == 'truncated_1'
+        uses: actions/upload-artifact@v3
         with:
           name: merged_artifacts
-          pattern: profile_optiprofiler_*
-          separate-directories: false
+          path: artifacts/**
+          if-no-files-found: error
+
+      - name: List final artifacts
+        if: success() && matrix.feature == 'truncated_1'
+        run: |
+          echo "Final artifacts:"
+          ls -la artifacts/
