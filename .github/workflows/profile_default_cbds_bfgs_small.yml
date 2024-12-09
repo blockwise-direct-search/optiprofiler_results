@@ -97,9 +97,11 @@ jobs:
             profile_optiprofiler(options);
             cd(root_dir);
 
+      - name: Update the name of the summary file
+        run: cd ./bds/tests/out/ && find . -type f -name 'summary*.pdf' -exec mv {} summary_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_${{ matrix.run_plain }}.pdf \;
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3.1.2
         with:
           name: profile_optiprofiler_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_${{ matrix.run_plain }}
-          path: ./bds/tests/out
+          path: ./bds/tests/out/**

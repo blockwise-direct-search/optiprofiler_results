@@ -1,7 +1,7 @@
 name: Profile cbds and bfgs using optiprofiler, small
 
 on:
-  push:
+  # push:
   workflow_dispatch:
 
 env:
@@ -119,7 +119,6 @@ jobs:
         competitor: [fminunc]
         run_plain: [false]
         feature: [plain, truncated_1, truncated_2, noisy_1e-1]
-
     
     steps:
       - name: Setup workspace cache
