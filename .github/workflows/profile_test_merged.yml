@@ -124,13 +124,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: profile_optiprofiler_cbds_fminunc_small_${{ matrix.feature }}_plain_false
-          path: artifacts
+          path: artifacts/${{ matrix.feature }}
 
       - name: List downloaded artifacts
         run: |
           echo "Artifact name being downloaded: profile_optiprofiler_cbds_fminunc_small_${{ matrix.feature }}_plain_false"
           echo "Artifacts contents:"
-          ls -la artifacts/ || echo "Artifacts not found"
+          ls -la artifacts/${{ matrix.feature }}/ || echo "Artifacts not found"
 
       - name: Upload merged artifacts
         if: success() && matrix.feature == 'truncated_1'
