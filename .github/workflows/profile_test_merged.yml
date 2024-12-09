@@ -126,5 +126,5 @@ jobs:
         uses: actions/upload-artifact/merge@v4
         with:
           name: merged_artifacts
-          pattern: profile_optiprofiler_*  # 与上传时相同的模式
+          pattern: cbds_fminunc_*  # 与上传时相同的模式
           separate-directories: false
