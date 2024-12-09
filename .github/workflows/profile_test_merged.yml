@@ -98,20 +98,22 @@ jobs:
         uses: actions/upload-artifact@v3.1.2
         with:
           name: profile_optiprofiler_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_plain_${{ matrix.run_plain }}
-          path: ./bds/tests/out
+          path: ./bds/tests/out/cbds_fminunc_*
 
-      - name: List files in output directory
+      - name: List uploaded artifacts
         run: |
-            ls -la ./bds/tests/out
+          echo "Uploaded artifacts:"
+          ls -la ./bds/tests/out/
 
   merge_artifacts:
     name: Merge Artifacts
     runs-on: ubuntu-latest
     needs: test
-    continue-on-error: true  # Ignore errors if there are too many artifacts
+    continue-on-error: true
     steps:
       - name: Merge Artifacts
         uses: actions/upload-artifact/merge@v4
         with:
           name: merged_artifacts
           pattern: cbds_fminunc_*
+          separate-directories: false
