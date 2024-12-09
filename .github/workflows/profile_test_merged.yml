@@ -111,8 +111,12 @@ jobs:
     needs: test
     continue-on-error: true
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 设置 GH_TOKEN 环境变量
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 设置 GH_TOKEN 环境变量 
     steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4  # 再次 checkout 代码以支持 GitHub CLI
+
       - name: Check available artifacts
         run: |
           echo "Available artifacts:"
