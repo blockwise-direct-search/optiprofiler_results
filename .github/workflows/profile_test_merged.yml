@@ -102,47 +102,6 @@ jobs:
           echo "Uploaded artifacts:"
           ls -la ./bds/tests/out/
 
-  # merge_artifacts:
-  #   name: Merge Artifacts
-  #   runs-on: ubuntu-latest
-  #   needs: test
-  #   permissions:
-  #     actions: read
-  #     contents: read
-  #   strategy:
-  #     matrix:
-  #       feature: [plain, truncated_1]
-    
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-
-  #     - name: Download artifacts
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: profile_optiprofiler_cbds_fminunc_small_${{ matrix.feature }}_plain_false
-  #         path: artifacts/${{ matrix.feature }}
-
-  #     - name: List downloaded artifacts
-  #       run: |
-  #         echo "Artifact name being downloaded: profile_optiprofiler_cbds_fminunc_small_${{ matrix.feature }}_plain_false"
-  #         echo "Artifacts contents:"
-  #         ls -la artifacts/${{ matrix.feature }}/ || echo "Artifacts not found"
-
-  #     - name: Upload merged artifacts
-  #       if: success() && matrix.feature == 'truncated_1'
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: merged_artifacts
-  #         path: artifacts/**
-  #         if-no-files-found: error
-
-  #     - name: List final artifacts
-  #       if: success() && matrix.feature == 'truncated_1'
-  #       run: |
-  #         echo "Final artifacts:"
-  #         ls -la artifacts/
-
   merge_artifacts:
     name: Merge Artifacts
     runs-on: ubuntu-latest
@@ -152,6 +111,10 @@ jobs:
       contents: read
     strategy:
       matrix:
+        dim: [small]
+        solver: [cbds]
+        competitor: [fminunc]
+        run_plain: [false]
         feature: [plain, truncated_1]
     
     steps:
@@ -165,7 +128,7 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
-          name: profile_optiprofiler_cbds_fminunc_small_${{ matrix.feature }}_plain_false
+          name: profile_optiprofiler_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_plain_${{ matrix.run_plain }}
           path: artifacts/${{ matrix.feature }}
 
       - name: List current artifacts
@@ -176,7 +139,7 @@ jobs:
       - name: Upload merged artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: merged_artifacts
+          name: profile_optiprofiler_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_plain_${{ matrix.run_plain }}_merged
           path: artifacts/**
           if-no-files-found: error
           retention-days: 1
