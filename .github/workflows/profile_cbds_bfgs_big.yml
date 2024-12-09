@@ -2,7 +2,7 @@ name: Profile cbds and bfgs using optiprofiler, big
 
 on:
   # Trigger the workflow on push or pull request
-  # push:
+  push:
   # Trigger the workflow manually
   # schedule:
   # - cron: '0 0 */2 * *'
@@ -114,7 +114,7 @@ jobs:
       contents: read
     strategy:
       matrix:
-        dim: [small]
+        dim: [big]
         solver: [cbds]
         competitor: [fminunc]
         run_plain: [false]
