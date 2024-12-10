@@ -37,6 +37,27 @@ jobs:
           ref: main
           path: bds
 
+      - name: Install Texlive
+        run: sudo apt-get update && sudo apt-get install texlive
+
+      - name: Check whether LaTeX is installed
+        run: pdflatex --version
+
+      - name: Cache MATLAB
+        id: cache-matlab
+        uses: actions/cache@v4.0.1
+        with:
+          path: ${{ runner.tool_cache }}/MATLAB
+          key: ${{ matrix.os }}-${{ matrix.matlab }}-${{ matrix.with_optim_toolbox }}
+
+      - name: Set up MATLAB with optimization toolbox
+        if: ${{ matrix.with_optim_toolbox == 'yes' }}
+        uses: matlab-actions/setup-matlab@v2.1.2
+        with:
+          release: ${{ matrix.matlab }}
+          products: Optimization_Toolbox
+      
+
       - name: Run test
         uses: matlab-actions/run-command@v2.1.1
         with:
