@@ -128,14 +128,10 @@ jobs:
       - name: Merge PDF files
         run: |
           cd downloaded_artifacts
-          mkdir summary
-          find . -type f -name 'summary*.pdf' -exec cp {} summary/ \;
-          cd summary
-          pdfunite *.pdf ../merged.pdf
-          echo "Merged PDF files into merged.pdf"
+          ls
 
       - name: Upload merged artifact
         uses: actions/upload-artifact@v3
         with:
           name: merged_profiles
-          path: downloaded_artifacts/merged.pdf
+          path: downloaded_artifacts
