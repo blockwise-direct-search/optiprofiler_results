@@ -98,7 +98,29 @@ jobs:
               cd(root_dir);
               cd(fullfile(root_dir, 'bds', 'tests', 'out'));
               ls -R
+              cd(root_dir);
 
+      - name: Change the summary file name
+        run: |
+          cd bds/tests/out
+          find . -type f -name 'summary.pdf' | while read -r file; do
+          # Obtain the parent directory and name
+          parent_dir=$(dirname "$file")
+          parent_name=$(basename "$parent_dir")
+
+          # Obtain the new name(Why the fifth underline? Because the last five parts are the time stamp)
+          new_name=$(echo "$parent_name" | awk -F'_' '{if(NF>=5) {for(i=1;i<=NF-5;i++) printf "%s%s", $i, (i<NF-5?"_":"")} else print $0}')
+
+          # Print the new name
+          echo "New name: $new_name"
+
+          # Obtain the directory name
+          dir_name=$(dirname "$file")
+
+          # Rename the file
+          mv "$file" "$dir_name/summary_$new_name.pdf"
+          echo "Renamed $file to $dir_name/summary_$new_name.pdf"
+          done
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3.1.2
@@ -132,51 +154,51 @@ jobs:
         run: |
           cd downloaded_artifacts
           ls -R
-          # mkdir summary
-          # find . -type f -name 'summary*.pdf' -exec cp {} summary/ \;
-          # cd summary
-          # # Define keywords to search for PDF files
-          # keywords=("plain"\
-          # "noisy_1e-1_no_rotation"\
-          # "noisy_1e-2_no_rotation"\
-          # "noisy_1e-3_no_rotation"\
-          # "noisy_1e-4_no_rotation"\
-          # "permuted"\
-          # "linearly_transformed"\
-          # "rotation_noisy_1e-1"\
-          # "rotation_noisy_1e-2"\
-          # "rotation_noisy_1e-3"\
-          # "rotation_noisy_1e-4"\
-          # "quantized"\
-          # "perturbed_x0"\
-          # "random_nan_5"\
-          # "random_nan_10"\
-          # "random_nan_20"\
-          # "truncated_1"\
-          # "truncated_2"\
-          # "truncated_3"\
-          # "truncated_4")
+          mkdir summary
+          find . -type f -name 'summary*.pdf' -exec cp {} summary/ \;
+          cd summary
+          # Define keywords to search for PDF files
+          keywords=("plain"\
+          "noisy_1_no_rotation"\
+          "noisy_2_no_rotation"\
+          "noisy_3_no_rotation"\
+          "noisy_4_no_rotation"\
+          "permuted"\
+          "linearly_transformed"\
+          "rotation_noisy_1"\
+          "rotation_noisy_2"\
+          "rotation_noisy_3"\
+          "rotation_noisy_4"\
+          "quantized"\
+          "perturbed_x0"\
+          "random_nan_5"\
+          "random_nan_10"\
+          "random_nan_20"\
+          "truncated_1"\
+          "truncated_2"\
+          "truncated_3"\
+          "truncated_4")
 
-          # output_file="merged.pdf"
-          # declare -a pdf_files  # Use an array to store PDF files
+          output_file="merged.pdf"
+          declare -a pdf_files  # Use an array to store PDF files
 
-          # # Loop through each keyword
-          # for keyword in "${keywords[@]}"; do
-          #     # Find PDF files with the keyword
-          #     for file in *"$keyword"*.pdf; do
-          #         if [[ -f "$file" && ! " ${pdf_files[*]} " =~ " $file " ]]; then  # Check if the file exists and is not already in the array
-          #             pdf_files+=("$file")
-          #         fi
-          #     done
-          # done
+          # Loop through each keyword
+          for keyword in "${keywords[@]}"; do
+              # Find PDF files with the keyword
+              for file in *"$keyword"*.pdf; do
+                  if [[ -f "$file" && ! " ${pdf_files[*]} " =~ " $file " ]]; then  # Check if the file exists and is not already in the array
+                      pdf_files+=("$file")
+                  fi
+              done
+          done
 
-          # # Merge PDF files
-          # if [[ ${#pdf_files[@]} -gt 0 ]]; then
-          #     pdfunite "${pdf_files[@]}" "$output_file"
-          #     echo "Merge successfully: $output_file"
-          # else
-          #     echo "There are no PDF files to merge."
-          # fi
+          # Merge PDF files
+          if [[ ${#pdf_files[@]} -gt 0 ]]; then
+              pdfunite "${pdf_files[@]}" "$output_file"
+              echo "Merge successfully: $output_file"
+          else
+              echo "There are no PDF files to merge."
+          fi
 
       - name: Upload merged artifact
         uses: actions/upload-artifact@v3
