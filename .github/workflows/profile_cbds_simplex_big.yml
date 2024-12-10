@@ -29,6 +29,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Checkout OptiProfiler
+        uses: actions/checkout@v4
+        with:
+          repository: optiprofiler/optiprofiler
+          ref: matlab
+          path: optiprofiler
       
       - name: Checkout BDS
         uses: actions/checkout@v4
