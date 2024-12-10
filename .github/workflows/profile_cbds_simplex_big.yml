@@ -96,6 +96,8 @@ jobs:
               options.run_plain = ${{ matrix.run_plain }};
               profile_optiprofiler(options);
               cd(root_dir);
+              cd(fullfile(root_dir, 'bds', 'tests', 'out'));
+              ls -R
 
 
       - name: Upload artifact
