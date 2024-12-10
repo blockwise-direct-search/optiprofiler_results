@@ -63,7 +63,8 @@ jobs:
       - name: Download artifacts for each feature
         run: |
           features='${{ needs.test.outputs.matrix-features }}'
-          features=$(echo $features | jq -r '.[]')
+          # 移除引号
+          features=$(echo $features | tr -d '"')
           solver="${{ needs.test.outputs.matrix-solver }}"
           competitor="${{ needs.test.outputs.matrix-competitor }}"
           dim="${{ needs.test.outputs.matrix-dim }}"
@@ -76,21 +77,3 @@ jobs:
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: List downloaded files
-        run: |
-          echo "Downloaded files:"
-          ls -R downloaded_artifacts/
-
-      - name: Merge PDF files
-        run: |
-          cd downloaded_artifacts
-          pdfunite */*.pdf merged.pdf
-          echo "Merged PDF files into merged.pdf"
-
-      - name: Upload merged artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: merged_artifact
-          path: downloaded_artifacts/merged.pdf
-          retention-days: 1
