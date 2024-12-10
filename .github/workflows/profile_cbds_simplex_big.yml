@@ -37,8 +37,37 @@ jobs:
           ref: main
           path: bds
 
-      - name: Update the name of the summary file
-        run: cd ./bds/tests/ && mkdir out/ && cd ./out && touch summary.pdf && mv summary.pdf summary_${{ matrix.solver }}_${{ matrix.competitor }}_${{ matrix.dim }}_${{ matrix.feature }}_${{ matrix.run_plain }}.pdf
+      - name: Run test
+        uses: matlab-actions/run-command@v2.1.1
+        with:
+            command: |
+              root_dir = pwd()
+              ls
+  
+              % Setup optiprofiler
+              cd(fullfile(root_dir, 'optiprofiler'));
+              setup
+              cd(root_dir);
+  
+              % Setup bds
+              cd(fullfile(root_dir, 'bds'));
+              setup
+              cd(fullfile(root_dir, 'bds', 'tests', 'competitors'));
+              addpath(pwd);
+  
+              % profile
+              cd(fullfile(root_dir, 'bds', 'tests'));
+              options = struct();
+              options.feature_name = '${{ matrix.feature }}';
+              options.labels = {'${{ matrix.solver }}', '${{ matrix.competitor }}'};
+              options.dim = '${{ matrix.dim }}';
+              options = rmfield(options, 'dim');
+              options.mindim = 1;
+              options.maxdim = 1;
+              options.run_plain = ${{ matrix.run_plain }};
+              profile_optiprofiler(options);
+              cd(root_dir);
+
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3.1.2
@@ -71,8 +100,9 @@ jobs:
       - name: Merge PDF files
         run: |
           cd downloaded_artifacts
-          find . -name "*.pdf" -exec sh -c 'mkdir -p temp && cp "{}" temp/' \;
-          cd temp
+          mkdir summary
+          find . -type f -name 'summary*.pdf' -exec cp {} summary/ \;
+          cd summary
           pdfunite *.pdf ../merged.pdf
           echo "Merged PDF files into merged.pdf"
 
