@@ -159,39 +159,72 @@ jobs:
           find . -type f -name 'summary*.pdf' -exec cp {} summary/ \;
           cd summary
           # Define keywords to search for PDF files
-          keywords=("plain"\
-          "noisy_1_no_rotation"\
-          "noisy_2_no_rotation"\
-          "noisy_3_no_rotation"\
-          "noisy_4_no_rotation"\
-          "permuted"\
-          "linearly_transformed"\
-          "rotation_noisy_1"\
-          "rotation_noisy_2"\
-          "rotation_noisy_3"\
-          "rotation_noisy_4"\
-          "quantized"\
-          "perturbed_x0"\
-          "random_nan_5"\
-          "random_nan_10"\
-          "random_nan_20"\
-          "truncated_1"\
-          "truncated_2"\
-          "truncated_3"\
-          "truncated_4")
+          keywords=(
+              "plain"
+              "noisy_1_no_rotation"
+              "noisy_2_no_rotation"
+              "noisy_3_no_rotation"
+              "noisy_4_no_rotation"
+              "rotation_noisy_1"
+              "rotation_noisy_2"
+              "rotation_noisy_3"
+              "rotation_noisy_4"
+              "permuted"
+              "linearly_transformed"
+              "quantized"
+              "perturbed_x0"
+              "random_nan_5"
+              "random_nan_10"
+              "random_nan_20"
+              "truncated_1"
+              "truncated_2"
+              "truncated_3"
+              "truncated_4"
+          )
 
           output_file="merged.pdf"
           declare -a pdf_files  # Use an array to store PDF files
 
-          # Loop through each keyword
+          # 先获取所有以summary开头的PDF文件
+          all_pdf_files=(summary*.pdf)
+
+          # 打印所有找到的PDF文件
+          echo "Found these PDF files:"
+          for file in "${all_pdf_files[@]}"; do
+              echo "  $file"
+          done
+
+          # 创建一个关联数组来存储关键词和对应的文件
+          declare -A keyword_to_file
+
+          # 首先找到所有关键词对应的文件
           for keyword in "${keywords[@]}"; do
-              # Find PDF files with the keyword
-              for file in *"$keyword"*.pdf; do
-                  if [[ -f "$file" && ! " ${pdf_files[*]} " =~ " $file " ]]; then  # Check if the file exists and is not already in the array
-                      pdf_files+=("$file")
+              echo "Searching for keyword: $keyword"
+              for file in "${all_pdf_files[@]}"; do
+                  if [[ $file == *"$keyword"* ]]; then
+                      echo "  Found file for keyword '$keyword': $file"
+                      keyword_to_file[$keyword]=$file
+                      break  # 每个关键词只匹配第一个找到的文件
                   fi
               done
           done
+
+          # 清空pdf_files数组
+          pdf_files=()
+
+          # 按照关键词的顺序添加文件
+          for keyword in "${keywords[@]}"; do
+              if [[ -n "${keyword_to_file[$keyword]}" ]]; then
+                  pdf_files+=("${keyword_to_file[$keyword]}")
+              fi
+          done
+
+          # Print the array content for debugging
+          echo -e "\nFiles in order of keywords:"
+          printf '%s\n' "${pdf_files[@]}"
+
+          # Print total number of files found
+          echo -e "\nTotal files found: ${#pdf_files[@]}"
 
           # Merge PDF files
           if [[ ${#pdf_files[@]} -gt 0 ]]; then
@@ -199,6 +232,8 @@ jobs:
               echo "Merge successfully: $output_file"
           else
               echo "There are no PDF files to merge."
+              echo -e "\nAll PDF files in current directory:"
+              ls summary*.pdf
           fi
 
       - name: Upload merged artifact
