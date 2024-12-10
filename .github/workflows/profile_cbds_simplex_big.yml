@@ -1,8 +1,8 @@
 name: Profile cbds and simplex using optiprofiler, big
 
 on:
-  # Trigger the workflow on push or pull request
-  push:
+  # Trigger the workflow on # push or pull request
+  # push:
   # Trigger the workflow manually
   # schedule:
   # - cron: '0 0 */3 * *'
@@ -22,7 +22,7 @@ jobs:
         solver: [cbds]
         competitor: [fminsearch]
         run_plain: [false]
-        feature: [noisy_1e-1, rotation_noisy_1e-1]
+        feature: [plain, perturbed_x0, noisy_1e-1, noisy_1e-2, noisy_1e-3, noisy_1e-4, truncated_1, truncated_2, truncated_3, truncated_4, permuted, linearly_transformed, random_nan_5, random_nan_10, random_nan_20, quantized, rotation_noisy_1e-1, rotation_noisy_1e-2, rotation_noisy_1e-3, rotation_noisy_1e-4]
 
     steps:
       - name: Check out repository
@@ -89,10 +89,6 @@ jobs:
               options.feature_name = '${{ matrix.feature }}';
               options.labels = {'${{ matrix.solver }}', '${{ matrix.competitor }}'};
               options.dim = '${{ matrix.dim }}';
-              options = rmfield(options, 'dim');
-              options.mindim = 1;
-              options.maxdim = 2;
-              options.n_runs = 1;
               options.run_plain = ${{ matrix.run_plain }};
               profile_optiprofiler(options);
               cd(root_dir);
@@ -185,34 +181,34 @@ jobs:
           output_file="merged.pdf"
           declare -a pdf_files  # Use an array to store PDF files
 
-          # 先获取所有以summary开头的PDF文件
+          # Obtain all PDF files starting with 'summary'
           all_pdf_files=(summary*.pdf)
 
-          # 打印所有找到的PDF文件
+          # Print the array content for debugging
           echo "Found these PDF files:"
           for file in "${all_pdf_files[@]}"; do
               echo "  $file"
           done
 
-          # 创建一个关联数组来存储关键词和对应的文件
+          # Create an associative array to store keyword to file mapping
           declare -A keyword_to_file
 
-          # 首先找到所有关键词对应的文件
+          # Search for PDF files with keywords
           for keyword in "${keywords[@]}"; do
               echo "Searching for keyword: $keyword"
               for file in "${all_pdf_files[@]}"; do
                   if [[ $file == *"$keyword"* ]]; then
                       echo "  Found file for keyword '$keyword': $file"
                       keyword_to_file[$keyword]=$file
-                      break  # 每个关键词只匹配第一个找到的文件
+                      break  # Every keyword should have only one file
                   fi
               done
           done
 
-          # 清空pdf_files数组
+          # Clear array to store PDF files in order of keywords
           pdf_files=()
 
-          # 按照关键词的顺序添加文件
+          # Add PDF files to the array in order of keywords
           for keyword in "${keywords[@]}"; do
               if [[ -n "${keyword_to_file[$keyword]}" ]]; then
                   pdf_files+=("${keyword_to_file[$keyword]}")

@@ -1,7 +1,7 @@
 name: Check TeX_Bib Spelling
 
 on:
-  push:
+  # push:
     paths:
       - '**.tex'
       - '**.bib'

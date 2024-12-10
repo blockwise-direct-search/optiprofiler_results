@@ -1,7 +1,7 @@
 name: Profile cbds and bfgs using optiprofiler, small
 
 on:
-  # push:
+  # # push:
   workflow_dispatch:
 
 env:
