@@ -22,7 +22,7 @@ jobs:
         solver: [cbds]
         competitor: [fminsearch]
         run_plain: [false]
-        feature: [plain, perturbed_x0]
+        feature: [plain, perturbed_x0, truncated_1, permuted, linearly_transformed, random_nan_5, quantized, rotation_noisy_1e-1]
 
     steps:
       - name: Check out repository
@@ -129,6 +129,51 @@ jobs:
         run: |
           cd downloaded_artifacts
           ls -R
+          mkdir summary
+          find . -type f -name 'summary*.pdf' -exec cp {} summary/ \;
+          cd summary
+          # Define keywords to search for PDF files
+          keywords=("plain"\
+          "noisy_1e-1_no_rotation"\
+          "noisy_1e-2_no_rotation"\
+          "noisy_1e-3_no_rotation"\
+          "noisy_1e-4_no_rotation"\
+          "permuted"\
+          "linearly_transformed"\
+          "rotation_noisy_1e-1"\
+          "rotation_noisy_1e-2"\
+          "rotation_noisy_1e-3"\
+          "rotation_noisy_1e-4"\
+          "quantized"\
+          "perturbed_x0"\
+          "random_nan_5"\
+          "random_nan_10"\
+          "random_nan_20"\
+          "truncated_1"\
+          "truncated_2"\
+          "truncated_3"\
+          "truncated_4")
+
+          output_file="merged.pdf"
+          declare -a pdf_files  # Use an array to store PDF files
+
+          # Loop through each keyword
+          for keyword in "${keywords[@]}"; do
+              # Find PDF files with the keyword
+              for file in *"$keyword"*.pdf; do
+                  if [[ -f "$file" && ! " ${pdf_files[*]} " =~ " $file " ]]; then  # Check if the file exists and is not already in the array
+                      pdf_files+=("$file")
+                  fi
+              done
+          done
+
+          # Merge PDF files
+          if [[ ${#pdf_files[@]} -gt 0 ]]; then
+              pdfunite "${pdf_files[@]}" "$output_file"
+              echo "Merge successfully: $output_file"
+          else
+              echo "There are no PDF files to merge."
+          fi
 
       - name: Upload merged artifact
         uses: actions/upload-artifact@v3
