@@ -1,17 +1,19 @@
 name: Profile cbds and simplex using optiprofiler, big
 
 on:
-  # Trigger the workflow on push or pull request
   push:
-  # Trigger the workflow manually
-  # schedule:
-  # - cron: '0 0 */3 * *'
   workflow_dispatch:
 
 jobs:
   test:
     name: Profile BDS and fminsearch, big
     runs-on: ${{ matrix.os }}
+    outputs:
+      matrix-features: ${{ toJSON(matrix.feature) }}
+      matrix-solver: ${{ matrix.solver }}
+      matrix-competitor: ${{ matrix.competitor }}
+      matrix-dim: ${{ matrix.dim }}
+      matrix-run-plain: ${{ matrix.run_plain }}
     strategy:
       fail-fast: false
       matrix:
@@ -25,7 +27,6 @@ jobs:
         feature: [plain, perturbed_x0]
 
     steps:
-
       - name: Check out repository
         uses: actions/checkout@v4
         with:
@@ -54,41 +55,42 @@ jobs:
     permissions:
       actions: read
       contents: read
-  
+    
     steps:
-      - name: Setup workspace cache
-        uses: actions/cache@v3
-        with:
-          path: artifacts
-          key: artifacts-${{ github.run_id }}
-          restore-keys: artifacts-${{ github.run_id }}
+      - name: Install PDF tools
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
 
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: profile_optiprofiler_*
-          path: artifacts/
-
-      - name: List current artifacts
+      - name: Download artifacts for each feature
         run: |
-            echo "All artifacts:"
-            ls -R artifacts/
+          features='${{ needs.test.outputs.matrix-features }}'
+          features=$(echo $features | jq -r '.[]')
+          solver="${{ needs.test.outputs.matrix-solver }}"
+          competitor="${{ needs.test.outputs.matrix-competitor }}"
+          dim="${{ needs.test.outputs.matrix-dim }}"
+          run_plain="${{ needs.test.outputs.matrix-run-plain }}"
+          
+          mkdir -p downloaded_artifacts
+          for feature in $features; do
+            echo "Downloading artifacts for feature: $feature"
+            gh actions-artifact download "profile_optiprofiler_${solver}_${competitor}_${dim}_${feature}_${run_plain}" downloaded_artifacts/${feature}
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: merge the artifacts 
+      - name: List downloaded files
         run: |
-          cd artifacts
-          mkdir merged
-          find . -type f -name '*.pdf' -exec mv {} merged/ \;
-          ls -R merged/
+          echo "Downloaded files:"
+          ls -R downloaded_artifacts/
 
-      - name: Upload merged artifacts
+      - name: Merge PDF files
+        run: |
+          cd downloaded_artifacts
+          pdfunite */*.pdf merged.pdf
+          echo "Merged PDF files into merged.pdf"
+
+      - name: Upload merged artifact
         uses: actions/upload-artifact@v3
         with:
-          name: profile_optiprofiler_merged
-          path: artifacts/**
-          if-no-files-found: error
-
-      - name: List final artifacts
-        run: |
-            echo "All artifacts:"
-            ls -R artifacts/
+          name: merged_artifact
+          path: downloaded_artifacts/merged.pdf
+          retention-days: 1
