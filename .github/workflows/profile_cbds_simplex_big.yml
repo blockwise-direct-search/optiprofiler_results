@@ -91,7 +91,7 @@ jobs:
               options.dim = '${{ matrix.dim }}';
               options = rmfield(options, 'dim');
               options.mindim = 1;
-              options.maxdim = 1;
+              options.maxdim = 5;
               options.run_plain = ${{ matrix.run_plain }};
               profile_optiprofiler(options);
               cd(root_dir);
@@ -128,7 +128,7 @@ jobs:
       - name: Merge PDF files
         run: |
           cd downloaded_artifacts
-          ls
+          ls -R
 
       - name: Upload merged artifact
         uses: actions/upload-artifact@v3
