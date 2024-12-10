@@ -102,8 +102,9 @@ jobs:
 
       - name: Change the summary file name
         run: |
-          cd bds/tests/out
-          find . -type f -name 'summary.pdf' | while read -r file; do
+          cd ./bds/tests/out
+          ls -R
+          find . -type f -name 'summary*.pdf' | while read -r file; do
           # Obtain the parent directory and name
           parent_dir=$(dirname "$file")
           parent_name=$(basename "$parent_dir")
