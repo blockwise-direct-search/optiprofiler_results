@@ -1,19 +1,17 @@
 name: Profile cbds and simplex using optiprofiler, big
 
 on:
+  # Trigger the workflow on push or pull request
   push:
+  # Trigger the workflow manually
+  # schedule:
+  # - cron: '0 0 */3 * *'
   workflow_dispatch:
 
 jobs:
   test:
     name: Profile BDS and fminsearch, big
     runs-on: ${{ matrix.os }}
-    outputs:
-      matrix-features: ${{ toJSON(matrix.feature) }}
-      matrix-solver: ${{ matrix.solver }}
-      matrix-competitor: ${{ matrix.competitor }}
-      matrix-dim: ${{ matrix.dim }}
-      matrix-run-plain: ${{ matrix.run_plain }}
     strategy:
       fail-fast: false
       matrix:
@@ -60,20 +58,26 @@ jobs:
       - name: Install PDF tools
         run: sudo apt-get update && sudo apt-get install -y poppler-utils
 
-      - name: Download artifacts for each feature
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: downloaded_artifacts
+
+      - name: List downloaded files
         run: |
-          features='${{ needs.test.outputs.matrix-features }}'
-          # 移除引号
-          features=$(echo $features | tr -d '"')
-          solver="${{ needs.test.outputs.matrix-solver }}"
-          competitor="${{ needs.test.outputs.matrix-competitor }}"
-          dim="${{ needs.test.outputs.matrix-dim }}"
-          run_plain="${{ needs.test.outputs.matrix-run-plain }}"
-          
-          mkdir -p downloaded_artifacts
-          for feature in $features; do
-            echo "Downloading artifacts for feature: $feature"
-            gh actions-artifact download "profile_optiprofiler_${solver}_${competitor}_${dim}_${feature}_${run_plain}" downloaded_artifacts/${feature}
-          done
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          echo "Downloaded files:"
+          ls -R downloaded_artifacts/
+
+      - name: Merge PDF files
+        run: |
+          cd downloaded_artifacts
+          find . -name "*.pdf" -exec sh -c 'mkdir -p temp && cp "{}" temp/' \;
+          cd temp
+          pdfunite *.pdf ../merged.pdf
+          echo "Merged PDF files into merged.pdf"
+
+      - name: Upload merged artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: merged_profiles
+          path: downloaded_artifacts/merged.pdf
