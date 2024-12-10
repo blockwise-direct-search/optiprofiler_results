@@ -56,12 +56,12 @@ jobs:
       contents: read
   
     steps:
-      # - name: Setup workspace cache
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: artifacts
-      #     key: artifacts-${{ github.run_id }}
-      #     restore-keys: artifacts-${{ github.run_id }}
+      - name: Setup workspace cache
+        uses: actions/cache@v3
+        with:
+          path: artifacts
+          key: artifacts-${{ github.run_id }}
+          restore-keys: artifacts-${{ github.run_id }}
 
       - name: Download artifacts
         uses: actions/download-artifact@v3
