@@ -171,3 +171,9 @@ jobs:
         with:
           name: merged_profiles
           path: bds/tests/testdata/downloaded_artifacts/**
+
+      - name: Upload summary files
+        uses: actions/upload-artifact@v3
+        with:
+          name: summary_files
+          path: bds/tests/testdata/downloaded_artifacts/summary/**
