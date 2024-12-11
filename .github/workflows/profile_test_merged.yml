@@ -163,8 +163,21 @@ jobs:
       - name: Merge PDF files
         run: |
           cp bds/tests/tools/merge_pdf.sh bds/tests/testdata/downloaded_artifacts
-          cd bds/tests/testdata/downloaded_artifacts
+          cd bds/tests/testdata/downloaded_artifacts/
+
+          ARTIFACT_NAME=$(ls | grep "profile_optiprofiler" | head -n 1)
+          BASE_INFO=$(echo $ARTIFACT_NAME | sed -n 's/.*optiprofiler_\([^_]*_[^_]*_\(small\|big\)\).*/\1/p')
+          echo "Base info extracted: ${BASE_INFO}"
+
           bash merge_pdf.sh
+
+          cd bds/tests/testdata/downloaded_artifacts/summary/
+          mv merged.pdf "summary_${BASE_INFO}.pdf"
+
+          cd bds/tests/testdata/downloaded_artifacts/
+          if [ -d "summary" ]; then
+            mv summary "summary_${BASE_INFO}"
+          fi
 
       - name: Upload merged artifact
         uses: actions/upload-artifact@v3
