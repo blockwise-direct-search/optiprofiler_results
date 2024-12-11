@@ -170,7 +170,7 @@ jobs:
           echo "Base info extracted: ${BASE_INFO}"
 
           bash merge_pdf.sh
-          cd bds/tests/testdata/downloaded_artifacts/
+          cd bds/tests/testdata/
           ls -R
 
           # cd bds/tests/testdata/downloaded_artifacts/summary/
