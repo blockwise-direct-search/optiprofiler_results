@@ -170,15 +170,12 @@ jobs:
           echo "Base info extracted: ${BASE_INFO}"
 
           bash merge_pdf.sh
-          ls -R
+          mv merged.pdf "summary_${BASE_INFO}.pdf"
 
-          # cd bds/tests/testdata/downloaded_artifacts/summary/
-          # mv merged.pdf "summary_${BASE_INFO}.pdf"
-
-          # cd bds/tests/testdata/downloaded_artifacts/
-          # if [ -d "summary" ]; then
-          #   mv summary "summary_${BASE_INFO}"
-          # fi
+          cd ..
+          if [ -d "summary" ]; then
+            mv summary "summary_${BASE_INFO}"
+          fi
 
       - name: Upload merged artifact
         uses: actions/upload-artifact@v3
