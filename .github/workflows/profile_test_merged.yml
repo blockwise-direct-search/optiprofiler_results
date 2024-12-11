@@ -174,10 +174,10 @@ jobs:
           mv merged.pdf "summary_${BASE_INFO}.pdf"
           ls -R
 
-          # cd ..
-          # if [ -d "summary" ]; then
-          #   mv summary "summary_${BASE_INFO}"
-          # fi
+          cd ..
+          if [ -d "summary" ]; then
+            mv summary "summary_${BASE_INFO}"
+          fi
 
       - name: Upload merged artifact
         uses: actions/upload-artifact@v3
