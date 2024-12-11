@@ -194,4 +194,4 @@ jobs:
           BASE_INFO: ${{ env.BASE_INFO }}
         with:
           name: summary_files_${{ env.BASE_INFO }}
-          path: bds/tests/testdata/downloaded_artifacts/summary/**
+          path: bds/tests/testdata/downloaded_artifacts/summary_${{ env.BASE_INFO }}/**
