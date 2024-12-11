@@ -168,6 +168,7 @@ jobs:
           ARTIFACT_NAME=$(ls | grep "profile_optiprofiler" | head -n 1)
           BASE_INFO=$(echo $ARTIFACT_NAME | sed -n 's/.*optiprofiler_\([^_]*_[^_]*_\(small\|big\)\).*/\1/p')
           echo "Base info extracted: ${BASE_INFO}"
+          echo "BASE_INFO=${BASE_INFO}" >> $GITHUB_ENV
 
           bash merge_pdf.sh
           cd summary
@@ -181,12 +182,16 @@ jobs:
 
       - name: Upload merged artifact
         uses: actions/upload-artifact@v3
+        env:
+          BASE_INFO: ${{ env.BASE_INFO }}
         with:
-          name: merged_profiles
+          name: merged_profiles_${{ env.BASE_INFO }}
           path: bds/tests/testdata/downloaded_artifacts/**
 
       - name: Upload summary files
         uses: actions/upload-artifact@v3
+        env:
+          BASE_INFO: ${{ env.BASE_INFO }}
         with:
-          name: summary_files
+          name: summary_files_${{ env.BASE_INFO }}
           path: bds/tests/testdata/downloaded_artifacts/summary/**
