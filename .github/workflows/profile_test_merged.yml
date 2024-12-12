@@ -178,7 +178,11 @@ jobs:
 
           # Merge PDF files
           mkdir summary
-          find . -maxdepth 3 -type f -name 'summary*.pdf' -exec cp --update=none {} summary/ \;
+          for f in $(find . -maxdepth 3 -type f -name 'summary*.pdf'); do
+              if [ ! -f "summary/$(basename $f)" ]; then
+                  cp "$f" summary/
+              fi
+          done
           cd summary
           ls
           bash ../merge_pdf.sh
