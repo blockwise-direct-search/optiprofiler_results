@@ -177,12 +177,13 @@ jobs:
 
           bash merge_pdf.sh
           cd summary
-          mv merged.pdf "summary_${BASE_INFO}.pdf"
+          ls
+          # mv merged.pdf "summary_${BASE_INFO}.pdf"
 
-          cd ..
-          if [ -d "summary" ]; then
-            mv summary "summary_${BASE_INFO}"
-          fi
+          # cd ..
+          # if [ -d "summary" ]; then
+          #   mv summary "summary_${BASE_INFO}"
+          # fi
 
       - name: Upload merged artifact
         uses: actions/upload-artifact@v3
