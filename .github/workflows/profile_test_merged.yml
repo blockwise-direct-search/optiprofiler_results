@@ -105,22 +105,29 @@ jobs:
           cd ./bds/tests/out
           ls -R
           find . -type f -name 'summary*.pdf' | while read -r file; do
-          # Obtain the parent directory and name
-          parent_dir=$(dirname "$file")
-          parent_name=$(basename "$parent_dir")
+            # Obtain the parent directory and name
+            parent_dir=$(dirname "$file")
+            parent_name=$(basename "$parent_dir")
 
-          # Obtain the new name(Why the fifth underline? Because the last five parts are the time stamp)
-          new_name=$(echo "$parent_name" | awk -F'_' '{if(NF>=5) {for(i=1;i<=NF-5;i++) printf "%s%s", $i, (i<NF-5?"_":"")} else print $0}')
+            # Obtain the new name(Why the fifth underline? Because the last five parts are the time stamp)
+            new_name=$(echo "$parent_name" | awk -F'_' '{if(NF>=5) {for(i=1;i<=NF-5;i++) printf "%s%s", $i, (i<NF-5?"_":"")} else print $0}')
 
-          # Print the new name
-          echo "New name: $new_name"
+            # Print the new name
+            echo "New name: $new_name"
 
-          # Obtain the directory name
-          dir_name=$(dirname "$file")
-
-          # Rename the file
-          mv "$file" "$dir_name/summary_$new_name.pdf"
-          echo "Renamed $file to $dir_name/summary_$new_name.pdf"
+            # Obtain the directory name
+            dir_name=$(dirname "$file")
+            
+            # Establish the new file name
+            new_file="$dir_name/summary_$new_name.pdf"
+            
+            # Check if the source and destination are the same
+            if [ "$file" != "$new_file" ]; then
+              mv "$file" "$new_file"
+              echo "Renamed $file to $new_file"
+            else
+              echo "Source and destination are the same, skipping: $file"
+            fi
           done
 
       - name: Upload artifact
@@ -173,7 +180,6 @@ jobs:
           bash merge_pdf.sh
           cd summary
           mv merged.pdf "summary_${BASE_INFO}.pdf"
-          ls -R
 
           cd ..
           if [ -d "summary" ]; then
