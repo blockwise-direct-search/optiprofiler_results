@@ -178,16 +178,15 @@ jobs:
 
           # Merge PDF files
           mkdir summary
-          find . -maxdepth 2 -type f -name 'summary*.pdf' -exec cp {} summary/ \;
+          find . -maxdepth 3 -type f -name 'summary*.pdf' -exec cp --update=none {} summary/ \;
           cd summary
           ls
-          # bash ../merge_pdf.sh
-          # mv merged.pdf "summary_${BASE_INFO}.pdf"
-
-          # cd ..
-          # if [ -d "summary" ]; then
-          #   mv summary "summary_${BASE_INFO}"
-          # fi
+          bash ../merge_pdf.sh
+          cd ..
+          mv merged.pdf "summary_${BASE_INFO}.pdf"
+          if [ -d "summary" ]; then
+            mv summary "summary_${BASE_INFO}"
+          fi
 
       - name: Upload merged artifact
         uses: actions/upload-artifact@v3
