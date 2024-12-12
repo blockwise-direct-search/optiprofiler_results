@@ -22,7 +22,8 @@ jobs:
         solver: [cbds]
         competitor: [fminunc]
         run_plain: [false]
-        feature: [plain, perturbed_x0, perturbed_x0_1, perturbed_x0_10, noisy_1e-1, noisy_1e-2, noisy_1e-3, noisy_1e-4, truncated_1, truncated_2, truncated_3, truncated_4, permuted, linearly_transformed, random_nan_5, random_nan_10, random_nan_20, quantized, rotation_noisy_1e-1, rotation_noisy_1e-2, rotation_noisy_1e-3, rotation_noisy_1e-4]
+        # feature: [plain, perturbed_x0, perturbed_x0_1, perturbed_x0_10, noisy_1e-1, noisy_1e-2, noisy_1e-3, noisy_1e-4, truncated_1, truncated_2, truncated_3, truncated_4, permuted, linearly_transformed, random_nan_5, random_nan_10, random_nan_20, quantized, rotation_noisy_1e-1, rotation_noisy_1e-2, rotation_noisy_1e-3, rotation_noisy_1e-4]
+        feature: [perturbed_x0_1, rotation_noisy_1e-1]
 
     steps:
       - name: Check out repository
@@ -175,9 +176,12 @@ jobs:
           echo "Base info extracted: ${BASE_INFO}"
           echo "BASE_INFO=${BASE_INFO}" >> $GITHUB_ENV
 
-          bash merge_pdf.sh
+          # Merge PDF files
+          mkdir summary
+          find . -maxdepth 2 -type f -name 'summary*.pdf' -exec cp {} summary/ \;
           cd summary
           ls
+          # bash ../merge_pdf.sh
           # mv merged.pdf "summary_${BASE_INFO}.pdf"
 
           # cd ..
