@@ -187,6 +187,7 @@ jobs:
           ls
           bash ../merge_pdf.sh
           mv merged.pdf "summary_${BASE_INFO}.pdf"
+          cd ..
           if [ -d "summary" ]; then
             mv summary "summary_${BASE_INFO}"
           fi
