@@ -162,10 +162,8 @@ jobs:
 
       - name: List all files
         run: |
-          cd bds
+          cd bds/tests/testdata/downloaded_artifacts
           ls -R
-          # cd bds/tests/testdata/downloaded_artifacts
-          # ls -R
 
       - name: Merge PDF files
         run: |
